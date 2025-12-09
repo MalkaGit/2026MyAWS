@@ -5,9 +5,6 @@ Steps
     cd my-node-app
     npm init -y     //initalize node poject - creating package.json
 
-1.2 add .gitignore    
-    node_modules/
-    .env
 
 1.3 ceate code files 
     sever.js
@@ -50,16 +47,27 @@ Steps
 4. see console.logs in cloud watch
 
 5. git
-5.1 ceate git accountId
-5.2 commiting
+5.1 ceate git account
+5.2 commiting locally for first time
+      in parent diectoy: git init (ceate hidden .git)
+      in parent diectoy add .gitignore    
+        node_modules/
+        .env
       git branch
       git switch -c Ex00001
-      git init
       git add .
       git commit -m "Initial commit"
 5.3 ceate git repo on github (public)
 5.4 git remote add origin https://github.com/MalkaGit/2026MyAWS.git
 5.5 git push origin -u Ex00001
+
+6. other commits 
+    git branch
+    sit switch ...
+    git status ..
+    git add ...
+    git commit -m 
+    git push oigin <banch name>
 ======
 
 About
