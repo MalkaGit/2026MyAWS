@@ -4,17 +4,19 @@ Steps
     mkdir my-node-app
     cd my-node-app
     npm init -y     //initalize node poject - creating package.json
-1.2 add .gitignore
-    
+
+1.2 add .gitignore    
     node_modules/
     .env
 
 1.3 ceate code files 
     sever.js
     index.js
+
 1.4 install any package you need (adds to package.json and to node_modules)
     here, we dont need it 
     eg, npm install express
+
 1.5 if you got package.json with dependencies call
     npm install 
 
@@ -29,31 +31,35 @@ Steps
 
 
 
-
 3. to deploy on aws
    helper: https://www.youtube.com/watch?v=jRQNti30Pu8
+   (see mail regine.issan.jobs@gmail.com AWSEx0001)
 3.1 zip 
     Note: here, we only zip one file. 
           if needed other files o node_modules, change command 
     flow poweshell:
     Compress-Archive -Path index.js  function.zip -Force
 
-3.2 Ceate aws lambada to work with function url 
+3.2 Create aws lambada to work with function url 
+    aws lambada and function ul: how to deploy and test    
 
-3.2.1 login to aws managment console 
-3.2.2
-3.2.3
+3.3 test the aws (for now, the /songs and /songs/1)
 
+3.4 delete the aws lambda (to stop chaging)
 
+4. see console.logs in cloud watch
 
-10. git
-10.1 ceate git accountId
-10.2 commiting
+5. git
+5.1 ceate git accountId
+5.2 commiting
+      git branch
+      git switch -c Ex00001
       git init
       git add .
       git commit -m "Initial commit"
-10.3 pushing
-
+5.3 ceate git repo on github (public)
+5.4 git remote add origin https://github.com/MalkaGit/2026MyAWS.git
+5.5 git push origin -u Ex00001
 ======
 
 About
