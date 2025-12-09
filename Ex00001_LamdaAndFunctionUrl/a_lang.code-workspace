@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "a_lang",
+			"path": "../../../Regine/src/c_cpp/a_lang"
+		},
+		{
+			"name": "b_design_patterns",
+			"path": "../../../Regine/src/c_cpp/b_design_patterns"
+		},
+		{
+			"name": "c_extenal_services",
+			"path": "../../../Regine/src/c_cpp/c_extenal_services"
+		}
+	],
+	"settings": {}
+}
