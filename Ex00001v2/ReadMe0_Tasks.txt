@@ -2,6 +2,7 @@ Goal: refactor the code in js
 ✔️ Adding service layer
     All service methods made async
     Service returns Promises
+    Service and API mach industry standards
 ✔️ No changes to your API handler logic
 ✔️ Error types preserved
 ✔️ Fully compatible with future database use
@@ -11,7 +12,6 @@ Goal: refactor the code in js
 1.3 ceate code files 
     services\songService.js - new
     index.js - updated 
-
     sever.js - as before
 
 1.4 install any package you need (adds to package.json and to node_modules)
@@ -39,7 +39,10 @@ Goal: refactor the code in js
     Note: here, we only zip one file. 
           if needed other files o node_modules, change command 
     flow poweshell:
-    Compress-Archive -Path index.js  function.zip -Force
+    previous version: Compress-Archive -Path index.js  function.zip -Force
+    this version:     Compress-Archive -Path index.js, services -DestinationPath function.zip -Force
+
+3.1. connect to aws console 
 
 3.2 Create aws lambada to work with function url 
     aws lambada and function ul: how to deploy and test    
