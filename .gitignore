@@ -1,2 +1,19 @@
+# Global ignores for all subprojects
 node_modules/
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# Environment files
 .env
+.env.local
+
+# Editor folders
+.vscode/
+.idea/
+
+# TypeScript build info
+*.tsbuildinfo
