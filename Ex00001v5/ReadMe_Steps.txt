@@ -33,7 +33,8 @@
 
 
 
-3. to deployon aws
+3. to deployon aws (manually)
+===============================
    helper: https://www.youtube.com/watch?v=jRQNti30Pu8
    (see mail regine.issan.jobs@gmail.com AWSEx0001)
 3.1 zip 
@@ -45,17 +46,30 @@
     no need fo node_modules) 
     C:\Repos\LearningAWS2026\Ex00001v5> Compress-Archive -Path dist/index.js, dist/services, package.json -DestinationPath function.zip -Force
 
-3.1. connect to aws console 
+3.2. connect to aws console 
 
-3.2 Create aws lambada to work with function url 
+3.3 Create aws lambada to work with function url 
     aws lambada and function ul: how to deploy and test    
 
-3.3 test the aws (for now, the /songs and /songs/1)
+3.4 test the aws (for now, the /songs and /songs/1)
 
-3.4 delete the aws lambda (to stop chaging)
+3. delete the aws lambda (to stop chaging)
 
-4. see console.logs in cloud watch
+3.6 see console.logs in cloud watch
    (monitor tab => view cloud watch log)
+
+
+
+4. to deploy on aws again with script (assuming lambad aleady created on aws)
+===================================================================
+4.1 created script deploy.ps1 (see mail) 
+
+4.2 PS C:\Repos\LearningAWS2026\Ex00001v5> .\deploy.ps1
+
+
+
+
+
 
 5. git
 5.1 ceate git account

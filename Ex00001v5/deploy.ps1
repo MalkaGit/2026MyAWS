@@ -1,9 +1,8 @@
 #deploy.ps1
-#this script is used to deploy the lambda function to aws
-#it assumes that the lambda function is already created on aws
 #it builds code
 #it zips th code
 #it uploads the zip to aws lambda
+#it assumes that the lambda function is already created on aws
 
 $FunctionName = "SongsApi"
 $ZipFile = "function.zip"
