@@ -1,3 +1,5 @@
+   => TODO: Make video - see video from Yossi 
+
 Goal:  
 1. install on dev machine MySQL workbench
    simple 
@@ -9,22 +11,22 @@ Goal:
    => TODO: Make video - see video from Yossi 
 
 3. use  MySQL workbench to
-   A. create database 
-         create database spotifydb;
-         use spotifydb;
 
-   B. add songs table 
-      CREATE TABLE songs (
-        id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-        title VARCHAR(255) NOT NULL,
-        artist VARCHAR(255) NOT NULL
-    );
 
-   C. add row to the table  
 
-    INSERT INTO songs (title, artist)
-    VALUES ('Imagine', 'John Lennon');
+create database spotifydb;
+use spotifydb;
 
-   D. see data 
-    select * from songs
+CREATE TABLE songs (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  title VARCHAR(255) NOT NULL,
+  artist VARCHAR(255) NOT NULL,
+  url VARCHAR(2048)  NULL
+);
+
+
+INSERT INTO songs (title, artist)
+VALUES ('Imagine', 'John Lennon');
+
+select * from songs
 
