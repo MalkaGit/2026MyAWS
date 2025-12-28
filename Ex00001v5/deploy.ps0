@@ -1,0 +1,147 @@
+#deploy.ps0
+# Creates IAM role (if missing)
+# Creates Lambda function SongsApi2 (with placeholder code)
+# Creates Lambda Function URL
+# Sets auth = NONE (public)
+# Does NOT build
+# Does NOT zip your real code
+# Does NOT deploy application logic
+
+
+
+# =====================================
+# INFRASTRUCTURE ONLY - RUN ONCE
+# =====================================
+
+$FunctionName = "SongsApi2"
+$RoleName     = "SongsApi2LambdaRole"
+$Runtime      = "nodejs18.x"
+$Handler      = "index.handler"
+$Region       = aws configure get region
+
+Write-Host "=== Creating infrastructure for $FunctionName ==="
+
+# -------------------------------------
+# Step 1: Verify AWS CLI
+# -------------------------------------
+Write-Host "Checking AWS credentials..."
+aws sts get-caller-identity > $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "AWS CLI not configured. Run 'aws configure' first."
+    exit 1
+}
+
+# -------------------------------------
+# Step 2: Create IAM Role (if missing)
+# -------------------------------------
+$RoleArn = aws iam get-role `
+    --role-name $RoleName `
+    --query "Role.Arn" `
+    --output text 2>$null
+
+if (-not $RoleArn) {
+    Write-Host "Creating IAM role: $RoleName"
+
+@"
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": "lambda.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+"@ | Out-File trust-policy.json -Encoding utf8
+
+    aws iam create-role `
+        --role-name $RoleName `
+        --assume-role-policy-document file://trust-policy.json
+
+    aws iam attach-role-policy `
+        --role-name $RoleName `
+        --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+    Remove-Item trust-policy.json
+
+    Write-Host "Waiting for IAM role to propagate..."
+    Start-Sleep -Seconds 10
+
+    $RoleArn = aws iam get-role `
+        --role-name $RoleName `
+        --query "Role.Arn" `
+        --output text
+} else {
+    Write-Host "IAM role already exists."
+}
+
+Write-Host "Using Role ARN: $RoleArn"
+
+# -------------------------------------
+# Step 3: Create Placeholder Lambda Zip
+# -------------------------------------
+Write-Host "Creating placeholder Lambda code..."
+
+@"
+exports.handler = async () => {
+  return {
+    statusCode: 200,
+    body: 'SongsApi2 placeholder. Deploy real code next.'
+  };
+};
+"@ | Out-File index.js -Encoding utf8
+
+Compress-Archive -Path index.js -DestinationPath placeholder.zip -Force
+
+# -------------------------------------
+# Step 4: Create Lambda Function
+# -------------------------------------
+Write-Host "Creating Lambda function: $FunctionName"
+
+aws lambda create-function `
+  --function-name $FunctionName `
+  --runtime $Runtime `
+  --role $RoleArn `
+  --handler $Handler `
+  --zip-file fileb://placeholder.zip `
+  --timeout 10 `
+  --memory-size 128
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Lambda creation failed (does it already exist?)"
+    exit 1
+}
+
+# Cleanup placeholder files
+Remove-Item index.js, placeholder.zip
+
+# -------------------------------------
+# Step 5: Create Function URL (PUBLIC)
+# -------------------------------------
+Write-Host "Creating Function URL (auth = NONE)..."
+
+$FunctionUrl = aws lambda create-function-url-config `
+  --function-name $FunctionName `
+  --auth-type NONE `
+  --query "FunctionUrl" `
+  --output text
+
+# -------------------------------------
+# Step 6: Allow Public Access
+# -------------------------------------
+Write-Host "Allowing public access..."
+
+aws lambda add-permission `
+  --function-name $FunctionName `
+  --statement-id FunctionURLPublicAccess `
+  --action lambda:InvokeFunctionUrl `
+  --principal "*" `
+  --function-url-auth-type NONE
+
+Write-Host ""
+Write-Host "=== INFRASTRUCTURE READY ==="
+Write-Host "Lambda Name : $FunctionName"
+Write-Host "Function URL: $FunctionUrl"
+Write-Host ""
+Write-Host "Next step: run deploy.ps1 to deploy real code."

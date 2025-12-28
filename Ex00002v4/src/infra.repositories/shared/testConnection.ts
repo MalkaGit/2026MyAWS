@@ -1,3 +1,6 @@
+//4c
+//Run:  npx ts-node src/db/testConnection.ts 
+ 
 import { pool } from "./db";
 
 async function testConnection() { 

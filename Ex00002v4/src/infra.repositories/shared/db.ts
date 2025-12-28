@@ -1,8 +1,11 @@
-//1
-//Best practices
-//  Connection pool
-//  No credentials in cod
-//  Works locally & in AWS
+//4a - .env
+//4b  db.ts
+//Best practices:
+//  Works locally & in AWS RDS (with MySQL)
+//  Credentials read from environment variables (.env file). 
+//  use connection pool for  efficient queries
+ 
+
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 

@@ -61,16 +61,25 @@ c:\Repos\LearningAWS2026\Ex00002v3>
     npm start
 
 postman 
-    GET http://localhost:3000/songs
-
-    GET http://localhost:3000/songs/{some id}
+    GET http://localhost:3000/api/songs
+    GET http://localhost:3000/api/songs/{some id}
 
     Create song and see id
-    curl -i -X POST http://localhost:3000/songs -H "Content-Type: application/json" -d "{\"title\":\"title a\",\"artist\":\"Artist a\"}" 
-
-    Update song (eg single field) 
-    curl -i -X PUT http://localhost:3000/songs/82f7844e-216f-4671-926e-1d50438cf1eb -H "Content-Type: application/json" -d "{\"title\":\"Updated !\"}" 
-
-    curl -X DELETE http://localhost:3000/songs/82f7844e-216f-4671-926e-1d50438cf1eb
+    curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 1\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}" 
+    curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 2\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}" 
+    curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 3\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}" 
+    curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 4\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}" 
 
 
+    (Partial) Update song (eg single field) - EG, TITLE
+    curl -i -X PATCH http://localhost:3000/api/songs/39606de9-131e-4fcb-955d-c9a942fa46ea -H "Content-Type: application/json" -d "{\"title\":\"title1 updated\"}"
+   
+
+    curl -X DELETE http://localhost:3000/api/songs/82f7844e-216f-4671-926e-1d50438cf1eb
+
+
+    TODO: ALLL Get by id variations
+
+    TODO: ALL Get ALL variations
+    GET http://localhost:3000/api/songs?include=artist
+    http://localhost:3000/api/songs?include=artist&fields=title
