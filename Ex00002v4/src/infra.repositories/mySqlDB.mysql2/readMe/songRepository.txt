@@ -1,0 +1,24 @@
+goal:
+
+    responsibilities (Best practices applied)
+1. prevent sql injection by ussing Parameterized queries:
+   all user input uses ? placeholders
+2. Field name mapping: domain names mapped to safe DB column names
+3. Whitelist validation: 
+   service layer validates sort fields
+4. Defense in depth: repository also enforces whitelist (no fallback)
+
+    clean:
+        tied to db
+        tied to library 
+        cloud agnostic 
+        fw aganostic (express, fasstify, next)
+ 
+
+        assumes app (reqest validation) and service already valiated the input =>
+        no validations 
+        => not throwing domain erros (assuming service did it)
+        may throw unexpected errors 
+
+
+

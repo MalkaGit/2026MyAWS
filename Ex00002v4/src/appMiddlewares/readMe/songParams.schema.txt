@@ -1,0 +1,19 @@
+/**
+ * Goal:  
+ *  request validation schema for:  
+ *    GET /songs/:id
+ *    PATCH /songs/:id
+ *    DELETE /songs/:id
+ *
+ * Responsibilities:
+ * - Validate path parameter `id`
+ * - Must be a UUID
+ * - Reject unknown path parameters (strict)
+ * 
+ * Note:
+ *  - HTTP boundary only
+ *  - Domain layer remains library-free
+ *  - 
+ *  - in router:   params: songParamsSchema
+ *        meaning, the schema gets id from the params o the url ( songs/{the id})
+ */

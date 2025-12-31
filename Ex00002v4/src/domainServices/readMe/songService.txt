@@ -1,0 +1,19 @@
+//Goal
+//Responsibilities
+//  - gets request from controller and pass it to repository
+//  - business rules validation throwing domain errors 
+//  - Assume request structure  is validated in application layer 
+//      => Do not apply Structural validation  here
+//      those are handled by the request validation middleware
+//Clean:
+//  - Framework agnostic 
+//  - Database agnostic
+//  - Library agnostic
+//  - Apply business rules validation here
+//    eg, insert song - validate artist existence here using ArtistRepository (business rule validation)
+//    eg, update song - validate artist existence if artistId is provided
+//    eg, get with artist field - validate that artist is in include
+//  - Service layer trusts that input is structurally valid (request validation middleware guarantees this for HTTP calls)
+//  - For non-HTTP callers (message queues, background jobs, other services): callers are responsible for validation
+//    This follows clean architecture principle: each layer validates at its boundary
+//    Request validation middleware validates HTTP requests, non-HTTP callers validate their own inputs

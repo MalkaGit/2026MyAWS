@@ -1,8 +1,7 @@
-//3c
-//Domain input - partail update (all optional)
+//3.5
 export interface SongUpdateInput {
-    title?: string;
-    artistId?: string;
-    url?: string;
+    title?: string;            // string | undefined. undefined - don't update, string - update     
+    artistId?: string;         // string | undefined. undefined - don't update, string - update
+    url?: string | null;       // string | undefined. undefined - don't update, null - set to null, string - update to string
   }
   

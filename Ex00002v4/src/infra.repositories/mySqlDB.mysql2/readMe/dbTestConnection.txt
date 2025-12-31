@@ -1,0 +1,6 @@
+/**
+ * Goal:  Test that db.ts can successfully connect to MySQL database using .env configuration
+ * 
+ * Usage: Run this script to verify database connectivity before starting the application
+ *      npx ts-node src/infra.repositories/mySql/dbTestConnection.ts
+ */

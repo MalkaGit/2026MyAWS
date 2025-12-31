@@ -1,7 +1,9 @@
+6.
 Goal: 
     The service layer is responsible for business logic  
     and throws domain-specific errors (NotFoundError, BadRequestError, etc.). 
-
+        Note: service layer does not haldle validations that are made by upper application layer (request validation)
+        
     NotFoundError 
     BadRequestError 
     ForbiddenError 
@@ -22,9 +24,9 @@ Flow
         Note:  domain-specific errors do not contain http error code !!!
                domain logic is decoupled from HTTP concerns
     
-    Controller or middleware (a global error handler):  
-    catch errors and map them to HTTP responses.  
-    and decides how to map domain errors to HTTP responses
+    Controller or error middleware (a global error handler):  
+        catch errors and map them to HTTP responses.  
+        and decides how to map domain errors to HTTP responses
 
  
 Benefits 

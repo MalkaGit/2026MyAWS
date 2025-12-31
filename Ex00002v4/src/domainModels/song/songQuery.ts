@@ -1,29 +1,19 @@
-//3d
-//Domain query input - include (join), fields
+//3.3
 export interface SongQuery {
-  include?: {
-    artist?: boolean;
-  };
-
-  fields?: {
-    id?: boolean;
-    title?: boolean;
-    url?: boolean;
-    artistId?: boolean;
-  };
-
-  pagination?: {
-    limit: number;   // max number of items to return
-    offset: number;  // number of items to skip
-  };
-
   /**
-   * Sorting
-   * Example: ?sort=title,-date
-   * - Field to sort by (e.g., title, artist_name)
-   * - Prefix "-" for descending order (e.g., "-date" for descending)
+   * Field selection: array of field names to return
+   * - Controls which fields (title/url/artistId) to return
+   * - id is always returned (industry best practice)
+   * - When omitted or empty, all fields are returned
+   * - Example: ['title', 'url'] returns only title and url fields
    */
-  sort?: string;
-}
-
+  fields?: string[];
   
+  /**
+   * Include related entities: array of relationship names to include
+   * - When omitted or empty, no related entities are included
+   * - Example: ['artist'] includes artist information
+   * - Industry best practice: string array enables generic repository pattern
+   */
+  include?: string[];
+}

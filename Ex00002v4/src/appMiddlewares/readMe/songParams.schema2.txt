@@ -1,0 +1,117 @@
+/**
+ * Goal:  
+ *  Request validation schema for path parameters in:
+ *    - GET /songs/:id
+ *    - PATCH /songs/:id
+ *    - DELETE /songs/:id
+ *
+ * Responsibilities:
+ *  - Validate path parameter structure and types at HTTP boundary
+ *  - Ensure id parameter is present and valid UUID format
+ *  - Reject unknown path parameters (security best practice)
+ *  - Provide machine-readable error codes for API consumers
+ *
+ * Note:
+ *  - HTTP boundary only - validates data from URL path parameters
+ *  - Domain layer remains validation-library free (no Zod in domain)
+ *  - Extracted from req.params (URL path segments)
+ *
+ * Usage:
+ *  - Used in songRouter.ts for GET/PATCH/DELETE /songs/:id endpoints
+ *  - Wired via createRequestValidator({ params: songParamsSchema })
+ *  - Validation happens before controller is called
+ *  - On validation failure: returns 400 Bad Request with error details
+ *  - On validation success: request proceeds to controller
+ *
+ * HTTP Request Examples:
+ *  GET /api/songs/39606de9-131e-4fcb-955d-c9a942fa46ea
+ *  PATCH /api/songs/39606de9-131e-4fcb-955d-c9a942fa46ea
+ *  DELETE /api/songs/39606de9-131e-4fcb-955d-c9a942fa46ea
+ *
+ *  In Express:
+ *    req.params = {
+ *      id: "39606de9-131e-4fcb-955d-c9a942fa46ea"
+ *    };
+ *
+ * Field Validation:
+ *
+ *  id: z.uuid()
+ *    - Type: string (required)
+ *    - Source: URL path parameter (e.g., /songs/:id)
+ *    - Validation: Must be valid UUID format
+ *    - Rejects: invalid UUID format, missing parameter, non-string types
+ *    - Purpose: Ensures song ID is valid UUID format before database operations
+ *    - Note: Does NOT validate that song exists (that's domain service responsibility)
+ *
+ * Schema Features:
+ *
+ *  .strict() - Security Feature
+ *    - Throws error if URL path contains parameters not defined in schema
+ *    - Prevents parameter injection attacks
+ *    - Example: If route is /songs/:id/:maliciousParam
+ *      → Validation fails with 'unrecognized_keys' error
+ *
+ * Validation Flow:
+ *
+ *  1. Request arrives at GET/PATCH/DELETE /songs/:id endpoint
+ *  2. Router calls createRequestValidator({ params: songParamsSchema })
+ *  3. Middleware extracts req.params (from URL path)
+ *  4. Zod validates req.params against songParamsSchema
+ *  5a. If valid: Middleware calls next() → Controller receives validated data
+ *  5b. If invalid: Middleware returns 400 with error details
+ *
+ * Error Response Format:
+ *
+ *  On validation failure, returns:
+ *    Status: 400 Bad Request
+ *    Body: {
+ *      code: 'REQUEST_VALIDATION_FAILED',
+ *      errors: [
+ *        { field: 'id', code: 'invalid_string' }
+ *      ]
+ *    }
+ *
+ *  Error codes:
+ *    - 'invalid_type': Wrong type (e.g., number instead of string)
+ *    - 'invalid_string': Invalid format (e.g., invalid UUID)
+ *    - 'unrecognized_keys': Unknown parameters in URL path
+ *
+ * Testing:
+ *
+ *  import { songParamsSchema } from './songParams.schema';
+ *
+ *  // Valid input
+ *  songParamsSchema.parse({
+ *    id: "39606de9-131e-4fcb-955d-c9a942fa46ea"
+ *  }); // ✅ Passes
+ *
+ *  // Invalid UUID format
+ *  songParamsSchema.parse({
+ *    id: "not-a-uuid"
+ *  }); // ❌ Fails: 'invalid_string' on id
+ *
+ *  // Missing required parameter
+ *  songParamsSchema.parse({}); // ❌ Fails: 'invalid_type' on id
+ *
+ *  // Unknown parameter
+ *  songParamsSchema.parse({
+ *    id: "39606de9-131e-4fcb-955d-c9a942fa46ea",
+ *    unknownParam: "value"
+ *  }); // ❌ Fails: 'unrecognized_keys'
+ *
+ * Architecture Notes:
+ *
+ *  - Clean separation: Validation happens at HTTP boundary only
+ *  - Domain independence: Domain layer doesn't depend on Zod
+ *  - Framework agnostic: Schema can be used with Express, Fastify, Next.js, etc.
+ *  - Cloud agnostic: Works in any environment (AWS, Azure, GCP, local)
+ *  - Library coupling: Schema is tied to Zod, but isolated to HTTP boundary
+ *  - Easy to replace: Can swap Zod for Joi, Yup, etc. without touching domain layer
+ *
+ * Security Considerations:
+ *
+ *  - .strict() prevents parameter injection attacks
+ *  - UUID validation prevents injection of invalid IDs
+ *  - Type validation prevents type confusion attacks
+ *  - Ensures only expected path parameters are accepted
+ */

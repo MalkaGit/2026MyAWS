@@ -1,0 +1,69 @@
+
+
+//"invalid_type", "too_small", unrecognized_keys",  "invalid_format", "unrecognized_keys"
+
+/*
+  valid: Create song and see id
+  curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 5\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}" 
+
+
+Example: title not sent in request =>"code":"invalid_type", 
+
+curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{ \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}"
+HTTP/1.1 400 Bad Request
+{"code":"REQUEST_VALIDATION_FAILED",
+"errors":[{"field":"title","message":"Invalid input: expected string, received undefined",
+"code":"invalid_type"}]}
+
+
+
+Example: title "" => "code":"too_small",
+ curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\"}"
+
+{"code":"REQUEST_VALIDATION_FAILED","errors":[{"field":"title",
+"message":"required",
+"code":"too_small"}]}
+
+
+
+
+
+
+artis id not given => "code":"invalid_type"
+
+C:\Users\regine> curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 5\"}"
+
+{"code":"REQUEST_VALIDATION_FAILED","errors":[{"field":"artistId","message":"Invalid input: expected string, received undefined",
+"code":"invalid_type"}]}
+
+
+
+
+artist id not uuid => "code":"invalid_format"
+ curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 5\", \"artistId\": \"88939d74\"}"
+HTTP/1.1 400 Bad Request
+
+{"code":"REQUEST_VALIDATION_FAILED","errors":[{"field":"artistId","message":"invalid_uuid","code":"invalid_format"}]}
+
+
+
+
+
+sending hack field => "code":"unrecognized_keys"
+curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 5\", \"artistId\": \"88939d74-dffd-11f0-87a2-0afd50b0f46d\", \"hack\": true}"
+
+HTTP/1.1 400 Bad Request
+
+{"code":"REQUEST_VALIDATION_FAILED","errors":
+[{"field":"_request","message":"Unrecognized key: \"hack\"",
+"code":"unrecognized_keys"}]}
+
+
+
+url not valid => "code":"invalid_format"
+ curl -i -X POST http://localhost:3000/api/songs -H "Content-Type: application/json" -d "{\"title\":\"title 5\", \"url\":\"hi\"}"
+
+
+{"code":"REQUEST_VALIDATION_FAILED","errors":[{"field":"artistId","message":"Invalid input: expected string, received undefined","code":"invalid_type"},{"field":"url","message":"invalid_url",
+"code":"invalid_format"}]}
+*/

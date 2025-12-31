@@ -1,0 +1,156 @@
+/*
+ * Goal:  
+ *  Request validation schema for: POST /songs
+ *
+ * Responsibilities:
+ *  - Validate request body structure and types at HTTP boundary
+ *  - Ensure required fields are present and properly formatted
+ *  - Reject unknown fields (security best practice)
+ *  - Provide machine-readable error codes for API consumers
+ *
+ * Note:
+ *  - HTTP boundary only - validates data coming from HTTP requests
+ *  - Domain layer remains validation-library free (no Zod in domain)
+ *  - Schema matches SongCreateInput domain model structure
+ *  - Extracted from req.body (JSON payload)
+ *
+ * Usage:
+ *  - Used in songRouter.ts for POST /songs endpoint
+ *  - Wired via createRequestValidator({ body: songCreateSchema })
+ *  - Validation happens before controller is called
+ *  - On validation failure: returns 400 Bad Request with error details
+ *  - On validation success: request proceeds to controller
+ *
+ * HTTP Request Example:
+ *  POST /api/songs
+ *  Content-Type: application/json
+ *  {
+ *    "title": "My Song",
+ *    "artistId": "88939d74-dffd-11f0-87a2-0afd50b0f46d",
+ *    "url": "https://mysong.com/song.mp3"
+ *  }
+ *
+ *  In Express:
+ *    req.body = {
+ *      title: "My Song",
+ *      artistId: "88939d74-dffd-11f0-87a2-0afd50b0f46d",
+ *      url: "https://mysong.com/song.mp3"
+ *    };
+ *
+ * Field-by-Field Validation:
+ *
+ *  1. title: z.string().min(1)
+ *     - Type: string (required)
+ *     - Validation: Must be non-empty string (minimum length 1)
+ *     - Rejects: empty strings (""), null, undefined, non-string types
+ *     - Purpose: Ensures song has a title
+ *
+ *  2. artistId: z.uuid()
+ *     - Type: string (required)
+ *     - Validation: Must be valid UUID format
+ *     - Rejects: invalid UUID format, null, undefined, non-string types
+ *     - Purpose: Ensures artist reference is valid UUID format
+ *     - Note: Does NOT validate that artist exists (that's domain service responsibility)
+ *
+ *  3. url: z.url().optional()
+ *     - Type: string | undefined (optional)
+ *     - Validation: If provided, must be valid URL format
+ *     - Accepts: valid URL string, undefined (omitted field)
+ *     - Rejects: invalid URL format, null (if provided)
+ *     - Purpose: Ensures URL is valid format when provided
+ *     - Note: If undefined, defaults to null in database (handled by repository)
+ *
+ * Schema Features:
+ *
+ *  .strict() - Security Feature
+ *    - Throws error if request contains fields not defined in schema
+ *    - Prevents mass assignment attacks
+ *    - Example: If request includes { title: "...", artistId: "...", maliciousField: "..." }
+ *      → Validation fails with 'unrecognized_keys' error
+ *
+ * Validation Flow:
+ *
+ *  1. Request arrives at POST /songs endpoint
+ *  2. Router calls createRequestValidator({ body: songCreateSchema })
+ *  3. Middleware extracts req.body
+ *  4. Zod validates req.body against songCreateSchema
+ *  5a. If valid: Middleware calls next() → Controller receives validated data
+ *  5b. If invalid: Middleware returns 400 with error details
+ *
+ * Error Response Format:
+ *
+ *  On validation failure, returns:
+ *    Status: 400 Bad Request
+ *    Body: {
+ *      code: 'REQUEST_VALIDATION_FAILED',
+ *      errors: [
+ *        { field: 'title', code: 'too_small' },
+ *        { field: 'artistId', code: 'invalid_string' }
+ *      ]
+ *    }
+ *
+ *  Error codes:
+ *    - 'invalid_type': Wrong type (e.g., number instead of string)
+ *    - 'too_small': String too short (e.g., empty string for title)
+ *    - 'invalid_string': Invalid format (e.g., invalid UUID, invalid URL)
+ *    - 'unrecognized_keys': Unknown fields in request
+ *
+ * Testing:
+ *
+ *  import { songCreateSchema } from './songCreate.schema';
+ *
+ *  // Valid input
+ *  songCreateSchema.parse({
+ *    title: "My Song",
+ *    artistId: "88939d74-dffd-11f0-87a2-0afd50b0f46d",
+ *    url: "https://example.com/song.mp3"
+ *  }); // ✅ Passes
+ *
+ *  // Missing required field
+ *  songCreateSchema.parse({
+ *    title: "My Song"
+ *    // artistId missing
+ *  }); // ❌ Fails: 'invalid_type' on artistId
+ *
+ *  // Invalid UUID format
+ *  songCreateSchema.parse({
+ *    title: "My Song",
+ *    artistId: "not-a-uuid"
+ *  }); // ❌ Fails: 'invalid_string' on artistId
+ *
+ *  // Empty string for title
+ *  songCreateSchema.parse({
+ *    title: "",
+ *    artistId: "88939d74-dffd-11f0-87a2-0afd50b0f46d"
+ *  }); // ❌ Fails: 'too_small' on title
+ *
+ *  // Unknown field
+ *  songCreateSchema.parse({
+ *    title: "My Song",
+ *    artistId: "88939d74-dffd-11f0-87a2-0afd50b0f46d",
+ *    unknownField: "value"
+ *  }); // ❌ Fails: 'unrecognized_keys'
+ *
+ * Architecture Notes:
+ *
+ *  - Clean separation: Validation happens at HTTP boundary only
+ *  - Domain independence: Domain models (SongCreateInput) don't depend on Zod
+ *  - Framework agnostic: Schema can be used with Express, Fastify, Next.js, etc.
+ *  - Cloud agnostic: Works in any environment (AWS, Azure, GCP, local)
+ *  - Library coupling: Schema is tied to Zod, but isolated to HTTP boundary
+ *  - Easy to replace: Can swap Zod for Joi, Yup, etc. without touching domain layer
+ *
+ * Relationship to Domain Model:
+ *
+ *  Schema validates: { title: string, artistId: string, url?: string }
+ *  Domain model: SongCreateInput { title: string, artistId: string, url?: string }
+ *  → Schema ensures data matches domain model structure before it reaches domain layer
+ *
+ * Security Considerations:
+ *
+ *  - .strict() prevents mass assignment attacks
+ *  - UUID validation prevents injection of invalid IDs
+ *  - URL validation prevents XSS via malformed URLs
+ *  - Type validation prevents type confusion attacks
+ */
+

@@ -1,0 +1,23 @@
+/*
+* Goal:  
+*  request validation schema for:  Get /songs/id
+*
+* Note:
+*  - HTTP boundary only
+*  - Domain layer remains library-free
+*  - see the schena matches songQueryInput
+*  - extracted from req.query (query string format follows industry best practice)
+*
+* Query String Format (Industry Best Practice):
+*  - fields: comma-separated list (e.g., ?fields=title,url,artistId)
+*    Example: GET /songs/123?fields=title,url
+*  - include: comma-separated list (e.g., ?include=artist)
+*    Example: GET /songs/123?include=artist
+*  - Combined: GET /songs/123?fields=title,url&include=artist
+*
+*  - in router:   query: songQuerySchema.optional(), 
+*        meaning, the schema gets data from request. query string
+*
+* The schema transforms the comma-separated string into the boolean object format
+* expected by the domain layer: { title: true, url: true }
+*/

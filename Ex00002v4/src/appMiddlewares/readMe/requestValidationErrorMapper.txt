@@ -1,0 +1,5 @@
+//Goal: Maps Zod errors → API error DTO
+//clean:
+//  HTTP-agnostic
+//  tied to zod, not lib agnostic 
+ 

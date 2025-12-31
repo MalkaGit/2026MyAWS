@@ -1,0 +1,44 @@
+/**
+ * Goal:
+ *   Provide a reusable database connection pool for MySQL operations.
+ * 
+ * Responsibilities:
+ *   - Initialize  connection pool
+ *   - Export pool instance  (used by repositories)
+ * 
+ * Clean Architecture:
+ *   - tied to db, not db agnostic 
+ *   - Single responsibility: connection management only
+ * 
+ * Best Practices:
+ *   - Configuration via environment variables (no hardcoded values)
+ *   - Works locally & in AWS RDS (with MySQL) 
+ *   - waitForConnections: true - queues requests when pool is exhausted
+ *   - connectionLimit: 10 - limits concurrent connections
+ * 
+ TODO:
+ Critical issues in db.ts per industry best practices:
+Missing environment variable validation
+Problem: If env vars are missing, the pool is created with undefined, causing runtime failures.
+Impact: App crashes at runtime instead of failing fast at startup.
+Port validation missing
+Problem: Number(process.env.DB_PORT) can be NaN if invalid.
+Impact: Silent failures or connection errors.
+No SSL configuration for AWS RDS
+Problem: Production AWS RDS requires SSL.
+Impact: Connections fail in production.
+Hard-coded connection limit
+Problem: connectionLimit: 10 is hard-coded.
+Impact: Can't adjust per environment (dev vs prod).
+Missing connection timeout
+Problem: No connectTimeout configured.
+Impact: Connections can hang indefinitely.
+No error handling
+Problem: Pool creation errors aren't caught.
+Impact: Unclear failures, harder debugging.
+Type safety issues
+Problem: Using potentially undefined values without guards.
+Impact: TypeScript won't catch runtime errors.
+Most critical: #1 (env validation), #3 (SSL for RDS), #2 (port validation).
+Should I implement fixes for these?
+ */

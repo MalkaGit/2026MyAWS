@@ -1,11 +1,5 @@
-//4a - .env
-//4b  db.ts
-//Best practices:
-//  Works locally & in AWS RDS (with MySQL)
-//  Credentials read from environment variables (.env file). 
-//  use connection pool for  efficient queries
- 
-
+//4.0 - .env
+//4.1  db.ts 
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 

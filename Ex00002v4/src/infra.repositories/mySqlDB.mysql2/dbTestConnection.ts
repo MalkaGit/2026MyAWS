@@ -1,4 +1,4 @@
-//4c
+//4.2
 //Run:  npx ts-node src/db/testConnection.ts 
  
 import { pool } from "./db";

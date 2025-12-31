@@ -1,10 +1,23 @@
- Responisble for  business logic 
+ Responsible for business logic 
  and throws domain errors
 
 Clean 
-Imprtant
-    its is framework agnostic (Express, Fastifty,NestJs)
-    it is db agnostic (Mongo, Dynamo, MySql, etc) 
+Important
+    it is framework agnostic (Express, Fastify, NestJS)
+    it is db agnostic (Mongo, Dynamo, MySql, etc)
+
+Structural Validation Note:
+  Service layer does NOT perform structural validation (required fields, empty strings, ID format, etc.).
+  This is handled by request validation middleware for HTTP requests.
+  
+  Principle: Each layer validates at its boundary
+  - Request validation middleware validates HTTP requests (structural/format validation)
+  - Service layer validates business rules only (business logic validation)
+  
+  For non-HTTP callers (message queues, background jobs, other services):
+  - Callers are responsible for validating their inputs before calling service methods
+  - This follows clean architecture: service layer trusts its contract
+  - Duplicating validation in service layer would violate DRY principle 
 
 Flow:
  
