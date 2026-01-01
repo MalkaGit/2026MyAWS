@@ -1,59 +1,42 @@
-//8.4
-// src/app.ts
-// Goal: 
-//    initalize express app (routes, middlewares etc)
-//    add health endpoint (used by Load balancers,Kubernetes,ECS, Monitoring tools)
-//Clean: 
-//    not fw agnostic (tied to express)
-//Industry standard :  
-//    do NOT call listen() in app.ts
+//9.5
+/**
+ * Express application setup
+ * 
+ * Initializes Express app with:
+ *  - Global middlewares (JSON parsing, CORS, logging)
+ *  - Health check endpoint (used by load balancers, Kubernetes, ECS, monitoring tools)
+ *  - API routes
+ *  - Error handling middleware (MUST be last)
+ * 
+ * Critical:
+ *    Clean: not fw agnostic (tied to express 
+ *  - Error middleware must be registered last to catch all errors from routes
+ *  - Do NOT call listen() here - separate concern (see server.ts)
+ */
+
+
 import express from "express";
 //import cors from "cors";
 //import morgan from "morgan";
 import { errorMiddleware } from "./appMiddlewares/errorMiddleware";
 import songRouter from "./appRoutes/songRouter";
 
-
 const app = express();
 
-/**
- * ──────────────────────────────
- * Global Middlewares
- * ──────────────────────────────
- */
-// Parse JSON request bodies
-app.use(express.json());
+// Global Middlewares
+app.use(express.json());  // Parse JSON request bodies
+// app.use(cors());        // Enable CORS (configure origins in production)
+// app.use(morgan("dev")); // HTTP request logging (replace with Pino later)
 
-// Enable CORS (configure origins in production)
-//app.use(cors());
-
-// HTTP request logging (replace with Pino later)
-//app.use(morgan("dev"));
-
-
-
-/**
- * ──────────────────────────────
- * Health check (important for load balancers / k8s) 
- * ──────────────────────────────
- */
+// Health check endpoint (used by load balancers, Kubernetes, ECS, monitoring tools)
 app.get("/health", (_req, res) => {
-    res.status(200).json({ status: "ok" });
-  });
-  
-/**
- * ──────────────────────────────
- * Routes
- * ──────────────────────────────
- */
-// API routes
+  res.status(200).json({ status: "ok" });
+});
+
+// API Routes
 app.use("/api/songs", songRouter);
 
-/**
- * ──────────────────────────────
- * Error Handling (MUST be last)
- * ──────────────────────────────
- */
+// Error Handling Middleware (MUST be last - catches all errors from routes above)
 app.use(errorMiddleware);
 
 export default app;

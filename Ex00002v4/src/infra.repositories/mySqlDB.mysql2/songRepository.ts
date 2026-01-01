@@ -142,6 +142,7 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
       sql += " LIMIT ? OFFSET ?";
       params.push(query.pagination.limit, query.pagination.offset);
     }
+   console.log('songRepository.getAllSongs - sql:', sql, 'query:', JSON.stringify(query, null, 2));
 
   // Execute query with the parameters
   const [rows] = await pool.query(sql, params);

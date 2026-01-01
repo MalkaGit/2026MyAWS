@@ -1,5 +1,5 @@
 //9.1
-// Express controller - thin layer that extracts validated request data and calls service
+// Thin controller layer: extracts validated data from req.validated, calls service, returns HTTP response
 import { Request, Response, NextFunction } from "express";
 import { SongCreateInput } from "../domainModels/song/songCreateInput";
 import { SongQuery } from "../domainModels/song/songQuery";
@@ -9,7 +9,7 @@ import * as songService from "../domainServices/songService";
 
 /**
  * GET /songs
- * Service throws NotFoundError/BadRequestError which are handled by error middleware (next(err))
+ * Errors → errorMiddleware (BadRequestError, NotFoundError)
  */
 export async function getAllSongs(
   req: Request,
@@ -17,18 +17,17 @@ export async function getAllSongs(
   next: NextFunction
 ) {
   try {
-    // req.query validated by middleware, but TypeScript doesn't know - safe to cast
-    const query: SongsQuery = mapSongsQuery(req);
+    const query: SongsQuery | undefined = req.validated?.query as SongsQuery | undefined;
     const songs = await songService.getAllSongs(query);
     res.status(200).json(songs);
   } catch (err) {
-    next(err); // Pass to error middleware (handles NotFoundError, BadRequestError, etc.)
+    next(err);
   }
 }
 
 /**
  * GET /songs/:id
- * Service throws NotFoundError if song not found (handled by error middleware)
+ * Errors → errorMiddleware (NotFoundError)
  */
 export async function getSongById(
   req: Request,
@@ -36,18 +35,18 @@ export async function getSongById(
   next: NextFunction
 ) {
   try {
-    const { id } = req.params; // Validated as UUID by middleware
-    // req.query validated by middleware, but TypeScript doesn't know - safe to cast
-    const query: SongQuery = mapSongQuery(req);
+    const { id } = req.validated!.params as { id: string };
+    const query: SongQuery | undefined = req.validated?.query as SongQuery | undefined;
     const song = await songService.getSongById(id, query);
     res.status(200).json(song);
   } catch (err) {
-    next(err); // Pass to error middleware
+    next(err);
   }
 }
 
 /**
  * POST /songs
+ * Errors → errorMiddleware (BadRequestError)
  */
 export async function createSong(
   req: Request,
@@ -55,8 +54,7 @@ export async function createSong(
   next: NextFunction
 ) {
   try {
-    // req.body validated by middleware - structure guaranteed valid
-    const input: SongCreateInput = req.body;
+    const input: SongCreateInput = req.validated!.body as SongCreateInput;
     const id = await songService.createSong(input);
     res.status(201).json({ id });
   } catch (err) {
@@ -66,7 +64,7 @@ export async function createSong(
 
 /**
  * PATCH /songs/:id
- * Service throws NotFoundError if song not found, BadRequestError if validation fails
+ * Errors → errorMiddleware (NotFoundError, BadRequestError)
  */
 export async function updateSong(
   req: Request,
@@ -74,9 +72,8 @@ export async function updateSong(
   next: NextFunction
 ) {
   try {
-    const { id } = req.params; // Validated as UUID by middleware
-    // req.body validated by middleware - structure guaranteed valid
-    const input: SongUpdateInput = req.body;
+    const { id } = req.validated!.params as { id: string };
+    const input: SongUpdateInput = req.validated!.body as SongUpdateInput;
     await songService.updateSong(id, input);
     res.status(204).send();
   } catch (err) {
@@ -86,7 +83,7 @@ export async function updateSong(
 
 /**
  * DELETE /songs/:id
- * Service throws NotFoundError if song not found (handled by error middleware)
+ * Errors → errorMiddleware (NotFoundError)
  */
 export async function deleteSong(
   req: Request,
@@ -94,7 +91,7 @@ export async function deleteSong(
   next: NextFunction
 ) {
   try {
-    const { id } = req.params; // Validated as UUID by middleware
+    const { id } = req.validated!.params as { id: string };
     await songService.deleteSong(id);
     res.status(204).send();
   } catch (err) {
@@ -102,34 +99,3 @@ export async function deleteSong(
   }
 }
 
-/**
- * Maps validated req.query to SongsQuery type.
- * Note: req.query is validated by middleware, but TypeScript types don't reflect this.
- * Type assertions are safe because validation middleware guarantees structure.
- */
-function mapSongsQuery(req: Request): SongsQuery {
-  return {
-    include: (req.query.include as string[]) || undefined,
-    fields: (req.query.fields as SongsQuery['fields']) || undefined,
-    // Schema preprocesses strings to numbers, but TypeScript still sees strings
-    pagination: req.query.limit
-      ? {
-          limit: Number(req.query.limit),
-          offset: Number(req.query.offset ?? 0),
-        }
-      : undefined,
-    sort: (req.query.sort as string[]) || undefined,
-  };
-}
-
-/**
- * Maps validated req.query to SongQuery type.
- * Note: req.query is validated by middleware, but TypeScript types don't reflect this.
- * Type assertions are safe because validation middleware guarantees structure.
- */
-function mapSongQuery(req: Request): SongQuery {
-  return {
-    include: (req.query.include as string[]) || undefined,
-    fields: (req.query.fields as SongQuery['fields']) || undefined,
-  };
-}

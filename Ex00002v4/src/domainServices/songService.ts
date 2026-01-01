@@ -5,7 +5,7 @@ import { SongsQuery } from "../domainModels/song/songsQuery";
 import { Song } from "../domainModels/song/song";
 import { SongUpdateInput } from "../domainModels/song/songUpdateInput";
 import * as songRepo from "../infra.repositories/mySqlDB.mysql2/songRepository";
-import { BadRequestError, NotFoundError } from "../domainErrors/domainErrors";
+import { BadRequestError, NotFoundError, DomainErrorCode } from "../domainErrors/domainErrors";
 
 const ALLOWED_SORT_FIELDS = ['id', 'title', 'url', 'artistId', 'artist_name'];
 
@@ -28,12 +28,14 @@ function validateSortFields(sort?: string[], include?: string[]): void {
   const invalidFields = fields.filter(field => !ALLOWED_SORT_FIELDS.includes(field));
   if (invalidFields.length > 0) {
     throw new BadRequestError(
+      DomainErrorCode.INVALID_SORT_VALUE,
       `Invalid sort fields: ${invalidFields.join(', ')}. Allowed fields: ${ALLOWED_SORT_FIELDS.join(', ')}`
     );
   }
 
   if (fields.includes('artist_name') && !include?.includes('artist')) {
     throw new BadRequestError(
+      DomainErrorCode.MISSING_INCLUDE_VALUE,
       'Sorting by artist_name requires include=artist. Please add ?include=artist to your request.'
     );
   }
@@ -56,7 +58,6 @@ function validateSortFields(sort?: string[], include?: string[]): void {
  */
 export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
   validateSortFields(query?.sort, query?.include);
-  
   const songs = await songRepo.getAllSongs(query);
   return songs;
 }
@@ -80,7 +81,7 @@ export async function getSongById(id: string, query?: SongQuery): Promise<Song> 
   const song = await songRepo.getSongById(id, query);
 
   if (!song) {
-    throw new NotFoundError(`Song with id ${id} not found`);
+    throw new NotFoundError(DomainErrorCode.SONG_NOT_EXIST, `Song with id ${id} not found`);
   }
 
   return song;
@@ -136,7 +137,7 @@ export async function createSong(input: SongCreateInput): Promise<string> {
  */
 export async function updateSong(id: string, input: SongUpdateInput): Promise<boolean> {
   if (!input || Object.keys(input).length === 0) {
-    throw new BadRequestError("Nothing to update");
+    throw new BadRequestError(DomainErrorCode.PARTIAL_UPDATE_WITHOUT_FIELDS, "Nothing to update");
   }
 
   // TODO: Implement artist existence validation when ArtistRepository is available
@@ -144,7 +145,7 @@ export async function updateSong(id: string, input: SongUpdateInput): Promise<bo
 
   const updated = await songRepo.updateSong(id, input);
   if (!updated) {
-    throw new NotFoundError(`Song with id ${id} not found`);
+    throw new NotFoundError(DomainErrorCode.SONG_NOT_EXIST, `Song with id ${id} not found`);
   }
 
   return updated;
@@ -165,7 +166,7 @@ export async function updateSong(id: string, input: SongUpdateInput): Promise<bo
 export async function deleteSong(id: string): Promise<boolean> {
   const deleted = await songRepo.deleteSong(id);
   if (!deleted) {
-    throw new NotFoundError(`Song with id ${id} not found`);
+    throw new NotFoundError(DomainErrorCode.SONG_NOT_EXIST, `Song with id ${id} not found`);
   }
   
   return deleted;

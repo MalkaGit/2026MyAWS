@@ -122,5 +122,21 @@ export const songsQuerySchema = z
     // Format: ?sort=title,-artistId (comma-separated list, prefix with "-" for descending)
     sort: sortStringToSortArray,
   })
-  .strict();
+  .strict()
+  //using transform since limit and offset in  domain object under pagination object
+  .transform((data) => {
+    // Transform limit and offset from top-level to pagination object (matches SongsQuery domain model)
+    const { limit, offset, ...rest } = data;
+    return {
+      ...rest,
+      ...(limit !== undefined
+        ? {
+            pagination: {
+              limit,
+              offset: offset ?? 0,
+            },
+          }
+        : {}),
+    };
+  });
 
