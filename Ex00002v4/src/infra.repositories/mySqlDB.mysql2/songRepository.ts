@@ -1,6 +1,7 @@
 //5.1
 import { ResultSetHeader } from "mysql2/promise";
 import { randomUUID } from "crypto";
+import {logger} from "../../utils/logger";
 import { pool } from "./db";
 import { SongCreateInput } from "../../domainModels/song/songCreateInput";
 import { SongQuery } from "../../domainModels/song/songQuery";
@@ -142,9 +143,9 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
       sql += " LIMIT ? OFFSET ?";
       params.push(query.pagination.limit, query.pagination.offset);
     }
-   console.log('songRepository.getAllSongs - sql:', sql, 'query:', JSON.stringify(query, null, 2));
 
   // Execute query with the parameters
+  logger.debug("getAllSongs - SQL query", { sql, params });
   const [rows] = await pool.query(sql, params);
   
   // Map each row to the Song domain model
@@ -185,6 +186,7 @@ export async function getSongById(id: string, query?: SongQuery): Promise<Song |
   sql += " WHERE s.id = ?";
   params.push(id);
 
+  logger.debug("getSongById - SQL query", { sql, params });
   const [rows] = await pool.query(sql, params);
   const result = rows as any[];
   return result.length ? mapRow(result[0], includeArtist) : null;
@@ -209,10 +211,10 @@ export async function getSongById(id: string, query?: SongQuery): Promise<Song |
  */
 export async function createSong(input: SongCreateInput): Promise<string> {
   const id = randomUUID();
-  await pool.query(
-    `INSERT INTO songs (id, title, artist_id, url) VALUES (?, ?, ?, ?)`,
-    [id, input.title, input.artistId, input.url ?? null]
-  );
+  const sql = `INSERT INTO songs (id, title, artist_id, url) VALUES (?, ?, ?, ?)`;
+  const params = [id, input.title, input.artistId, input.url ?? null];
+  logger.debug("createSong - SQL query", { sql, params });
+  await pool.query(sql, params);
   return id;
 }
 
@@ -268,12 +270,11 @@ export async function updateSong(id: string, input: SongUpdateInput): Promise<bo
   // Add id to params for WHERE clause
   params.push(id);
 
-  const [result] = await pool.query<ResultSetHeader>(
-    `UPDATE songs
+  const sql = `UPDATE songs
      SET ${setClauses.join(', ')}
-     WHERE id = ?`,
-    params
-  );
+     WHERE id = ?`;
+  logger.debug("updateSong - SQL query", { sql, params });
+  const [result] = await pool.query<ResultSetHeader>(sql, params);
 
   return result.affectedRows > 0;
 }
@@ -293,9 +294,9 @@ export async function updateSong(id: string, input: SongUpdateInput): Promise<bo
  * }
  */
 export async function deleteSong(id: string): Promise<boolean> {
-  const [result] = await pool.query<ResultSetHeader>(
-    `DELETE FROM songs WHERE id = ?`,
-    [id]
-  );
+  const sql = `DELETE FROM songs WHERE id = ?`;
+  const params = [id];
+  logger.debug("deleteSong - SQL query", { sql, params });
+  const [result] = await pool.query<ResultSetHeader>(sql, params);
   return result.affectedRows > 0;
 }

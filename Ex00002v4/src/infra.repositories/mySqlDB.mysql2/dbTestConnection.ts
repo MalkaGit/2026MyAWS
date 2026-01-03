@@ -1,6 +1,7 @@
 //4.2
-//Run:  npx ts-node src/db/testConnection.ts 
- 
+//Run:  npx ts-node src/infra.repositories/mySqlDB.mysql2/dbTestConnection.ts 
+
+
 import { pool } from "./db";
 
 async function testConnection() { 

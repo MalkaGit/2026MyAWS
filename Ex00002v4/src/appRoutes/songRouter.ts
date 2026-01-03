@@ -8,7 +8,7 @@
 // Error Middleware (catches  errors) 
 
 import { Router } from 'express';
-import { createRequestValidator } from '../appMiddlewares/requstValidatorMiddelware';
+import { createRequestValidator } from '../appMiddlewares/requstValidator';
 import { songCreateSchema } from '../appMiddlewares/requestSchemas/song/songCreate.schema';
 import { songUpdateSchema } from '../appMiddlewares/requestSchemas/song/songUpdate.schema';
 import { songQuerySchema } from '../appMiddlewares/requestSchemas/song/songQuery.schema';

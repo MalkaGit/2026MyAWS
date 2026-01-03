@@ -1,9 +1,12 @@
 //4.0 - .env
 //4.1  db.ts 
-import mysql from "mysql2/promise";
-import dotenv from "dotenv";
 
+// Load environment variables if not already loaded (defensive: ensures .env is available)
+// Note: dotenv.config() is idempotent - safe to call multiple times
+import dotenv from "dotenv";
 dotenv.config();
+
+import mysql from "mysql2/promise";
 
 export const pool = mysql.createPool({
   host: process.env.DB_HOST,
