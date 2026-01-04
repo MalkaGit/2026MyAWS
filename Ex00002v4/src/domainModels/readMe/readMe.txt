@@ -1,11 +1,19 @@
 
-1.  models used by the API of all layers
-    (repositories, services, controllers)
+Goal
+     models used by the API of all layers
+    (repositories api
+     services api 
+     idealy -  controllers (unless api requrie diffrent struture)
 
-2.  Matches many real-world APIs 
-    well-documented in the JSDoc.
+Clean
+1. cloud agnostic
+   http agnostic 
+   db agnostic 
 
-3.  about DTO
+2. Matches many real-world APIs 
+   well-documented in the JSDoc.
+
+3. about DTO
     we do not create DTO, unless Rest API require model that is not the domain model
 
     if REST API requieres other API,

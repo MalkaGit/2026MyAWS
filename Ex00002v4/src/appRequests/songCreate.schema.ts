@@ -1,9 +1,10 @@
-//8.1
+//8.2
 /**
  * Schema for creating a new song
  *  - Endpoint: POST /songs
  *  - Request Part: body (JSON payload)
- *  - Domain Model: SongCreateInput
+ *  - Model: SongCreateInput (no DTO, this is domain model)
+
  * 
  * Field Validation:
  *  - title: Required string, minimum length 1 (non-empty)

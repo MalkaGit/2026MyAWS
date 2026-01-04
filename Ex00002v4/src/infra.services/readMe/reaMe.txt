@@ -1,0 +1,31 @@
+
+ services 
+      
+
+  usually interact with external systems or implement technical behavior
+        Might manage connections, tokens, secrets, configuration
+        sometimes asynchronous, 
+
+  usually used by domain services and middlewares.
+  usally provide abstract api so consumers do not change as we change the implementation 
+      (eg, switch cloud provider)            
+
+  db agnotstic, shuld not change as we switch db 
+  fw agnostic (express,Next. fastify )
+  usually tied to cloud, not cloud  agnostic,
+        Can be replaced if the provider changes (e.g., move from AWS Cognito → GCP Identity Platform)
+
+  Usually business-agnostic but technical (works for multiple domains)
+
+  Usually stateful or configurable
+
+
+Responsibilities / Examples:
+
+	Example
+Authentication	    CognitoJwtVerifier (tokens issued by aws), LocalJwtVerifier (tolens issued by my service)
+Cloud APIs	S3Service, SESService
+External HTTP APIs	SpotifyApiService
+
+
+

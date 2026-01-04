@@ -1,9 +1,9 @@
-//8.2
+//8.3
 /**
  * Schema for validating URL path parameters
  *  - Endpoints: GET /songs/:id, PATCH /songs/:id, DELETE /songs/:id
  *  - Request Part: params (URL path parameters)
- *  - Domain Model: { id: string }
+ *  - Model: { id: string } (no DTO, this is domain model))
  * 
  * Field Validation:
  *  - id: Required string, must be valid UUID format

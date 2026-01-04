@@ -1,12 +1,22 @@
-//8.7
+//8.5
 /**
- * Request validation middleware using Zod schemas.
+ * Goal
+ *  Request parsing & validation middleware
+ *  using Zod schemas.
  * 
- * Critical:
- *   - Validates req.body, req.query, req.params before controller
- *   - Stores validated data in req.validated (raw data untouched)
- *   - Throws ZodError on failure → handled by errorMiddleware (returns 400)
+ * Flow:
+ * - Validates and parses request inputs (req.body, req.query, req.params)
+ *            can map comma seperated string to array
+* - Attaches parsed typed values back to req
+ * - Relies on Zod for runtime safety
+ * - Throws ZodError on failure → handled by errorMiddleware (returns 400)
  * 
+ * Clean:
+ * 1. Each request part (body, query, params) is validated and parsed.
+ * 2. After parsing, req.body/query/params contains typed values according to your schema.
+ * 3. Any ZodError is automatically caught and passed to next(err), letting your errorMiddleware handle it (returns 400 Bad Request).
+ * 4. reusable middleare: You can use createRequestValidator({ body, query, params }) for any route.
+ * 5. Controller simplicity: Controllers can assume that the request has valid types and structure, no need for req.validated or casting everywhere.
  * Usage: Router applies with schemas: createRequestValidator({ body, query, params })
  */
 
@@ -14,40 +24,32 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodTypeAny } from 'zod';
 
 /**
- * @param schemas - Optional Zod schemas for body, query, params
- * @returns Middleware that validates and stores in req.validated
+ * Request validation middleware using Zod schemas.
  * 
- * @example createRequestValidator({ body: schema, query: schema, params: schema })
+
  */
 export function createRequestValidator(schemas: {
-  body?: ZodTypeAny;    // Schema for req.body (request payload)
-  query?: ZodTypeAny;   // Schema for req.query (query string parameters)
-  params?: ZodTypeAny;  // Schema for req.params (URL path parameters)
+  body?: ZodTypeAny;
+  query?: ZodTypeAny;
+  params?: ZodTypeAny;
 }) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     try {
-      if (!req.validated) {
-        req.validated = {};
+      if (schemas.body) {
+        req.body = schemas.body.parse(req.body);  //req.body: any 
       }
 
-      // Parse throws ZodError on failure → caught below → passed to errorMiddleware
-      if (schemas.body) {
-        req.validated.body = schemas.body.parse(req.body);
-      }
       if (schemas.query) {
-        req.validated.query = schemas.query.parse(req.query);
+        req.query = schemas.query.parse(req.query) as Request['query']; //req.query: ParsedQs 
       }
+
       if (schemas.params) {
-        req.validated.params = schemas.params.parse(req.params);
+        req.params = schemas.params.parse(req.params) as Request['params']; //req.params: ParamsDictionary
       }
 
       next();
     } catch (err) {
-      // ZodError → errorMiddleware returns 400 with mapped error codes
-      // Other errors → errorMiddleware handles appropriately
       next(err);
     }
   };
 }
-
-

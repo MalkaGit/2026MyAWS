@@ -14,7 +14,7 @@
 //  Business code remains framework-agnostic
 
 import { Request, Response, NextFunction } from 'express';
-import { withRequestContext, requestContext } from '../utils/request-context';
+import { withRequestContext, requestContext } from '../infra.utils/request-context';
 import { randomUUID } from 'node:crypto';
 const CORRELATION_ID_HEADER = 'x-correlation-id';
 

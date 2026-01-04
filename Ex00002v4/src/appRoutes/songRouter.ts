@@ -1,7 +1,7 @@
 //9.2
 // Song routes with validation middleware
 // Flow: Request → 
-// Validation Middleware (writes to req.validated or throws zod errors) 
+// Validation Middleware (writes typed data to req or throws zod errors) 
 // → Controller (reads from req.validated) 
 // → Service (throws domain errors) 
 // → Repository
@@ -9,11 +9,11 @@
 
 import { Router } from 'express';
 import { createRequestValidator } from '../appMiddlewares/requstValidator';
-import { songCreateSchema } from '../appMiddlewares/requestSchemas/song/songCreate.schema';
-import { songUpdateSchema } from '../appMiddlewares/requestSchemas/song/songUpdate.schema';
-import { songQuerySchema } from '../appMiddlewares/requestSchemas/song/songQuery.schema';
-import { songsQuerySchema } from '../appMiddlewares/requestSchemas/song/songsQuery.schema';
-import { songParamsSchema } from '../appMiddlewares/requestSchemas/song/songParams.schema';
+import { QueryInputSchema } from '../appRequests/shared/queryInput.schema';
+import { QueryByIdInputSchema } from '../appRequests/shared/queryByIdInput.schema';
+import { songCreateSchema } from '../appRequests/songCreate.schema';
+import { songUpdateSchema } from '../appRequests/songUpdate.schema';
+import { songParamsSchema } from '../appRequests/songParams.schema';
 import * as songController from '../appControllers/songController';
 
 const songRouter = Router();
@@ -34,7 +34,7 @@ songRouter.post(
 songRouter.get(
   '/',
   createRequestValidator({ 
-    query: songsQuerySchema.optional() 
+    query: QueryInputSchema.optional() 
   }),
   songController.getAllSongs
 );
@@ -47,7 +47,7 @@ songRouter.get(
   '/:id',
   createRequestValidator({
     params: songParamsSchema,
-    query: songQuerySchema.optional(),
+    query: QueryByIdInputSchema.optional(),
   }),
   songController.getSongById
 );

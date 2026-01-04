@@ -1,5 +1,118 @@
-//8.4
 /**
+ * QueryInput request schema
+ *  *  - Endpoint: Get /songs
+ *  -  Model: QueryInput (no DTO, this is domain model))
+ * 
+ * Responsibility:
+ * - Parse query string values (string → number / string[])
+ *      validate and returns anonymos typed object
+ * - Validate basic structure and types
+ * - No business rules (those belong to service / domain validators)
+ *      eg, does not validate the values of fields, sort, include
+ */
+
+import { z } from "zod";
+
+export const QueryInputSchema = z.object({
+  /**
+   * Fields selection
+   * Example:
+   *   ?fields=title,url
+   */
+  fields: z
+    .preprocess(
+      (value) =>
+        typeof value === "string"
+          ? value.split(",").map(v => v.trim()).filter(Boolean)   //Boolean - removes empty strings
+          : value,
+      z.array(z.string()).optional()
+    ),
+
+  /**
+   * Include related entities
+   * Example:
+   *   ?include=artist
+   */
+  include: z
+    .preprocess(
+      (value) =>
+        typeof value === "string"
+          ? value.split(",").map(v => v.trim()).filter(Boolean)
+          : value,
+      z.array(z.string()).optional()
+    ),
+
+  /**
+   * Sorting
+   * Example:
+   *   ?sort=title,-artistId
+   */
+  sort: z
+    .preprocess(
+      (value) =>
+        typeof value === "string"
+          ? value.split(",").map(v => v.trim()).filter(Boolean)
+          : value,
+      z.array(z.string()).optional()
+    ),
+
+  /**
+   * Pagination
+   * Example:
+   *   ?limit=20&offset=0
+   */
+  limit: z
+    .preprocess(
+      (value) => (value !== undefined ? Number(value) : undefined),
+      z.number().int().positive().optional()
+    ),
+
+  offset: z
+    .preprocess(
+      (value) => (value !== undefined ? Number(value) : undefined),
+      z.number().int().min(0).optional()
+    ),
+})
+.strict(); //no other fields
+
+
+/**
+ * Type inferred from schema
+ * (Request-level DTO)
+ */
+//export type QueryInputDTO = z.infer<typeof QueryInputSchema>;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+older - wrong 
+-mapping and changing structure
+
+
+//8.4
+
  * Schema for query parameters when getting all songs
  *  - Endpoint: GET /songs
  *  - Request Part: query (query string parameters)
@@ -24,7 +137,7 @@
  * 
  
  * See ../readMe.txt for common validation schema information
- */
+ 
 
 import { z } from 'zod';
 
@@ -39,7 +152,7 @@ const ALLOWED_INCLUDE = ['artist'] as const;
 // Note: artist_name requires include=artist (validated in service layer)
 const ALLOWED_SORT_FIELDS = ['id', 'title', 'url', 'artistId', 'artist_name'] as const;
 
-/**
+
  * Generic helper to parse comma-separated query string values into string array
  * and validate against allowed values
  * 
@@ -49,7 +162,7 @@ const ALLOWED_SORT_FIELDS = ['id', 'title', 'url', 'artistId', 'artist_name'] as
  * @param removePrefix - Optional function to remove prefix before validation (e.g., remove "-" for sort fields)
  * @returns String array if valid, undefined if empty/omitted
  * @throws Error if invalid values are found
- */
+ 
 function parseCommaSeparatedString(
   val: unknown,
   allowedValues: readonly string[],
@@ -140,3 +253,4 @@ export const songsQuerySchema = z
     };
   });
 
+*/

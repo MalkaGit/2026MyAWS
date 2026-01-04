@@ -1,4 +1,4 @@
- Responsible for business logic 
+ Responsible for business logic  (also called use cases)
  and throws domain errors
 
 Clean 

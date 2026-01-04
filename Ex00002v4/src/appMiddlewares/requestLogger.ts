@@ -34,8 +34,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../utils/logger';
-import { requestContext } from '../utils/request-context';
+import { logger } from '../infra.utils/logger';
+import { requestContext } from '../infra.utils/request-context';
 
 // Threshold in milliseconds
 const SLOW_REQUEST_THRESHOLD_MS =

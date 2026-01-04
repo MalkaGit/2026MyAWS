@@ -23,7 +23,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import app from "./app";
-import { logger } from "./utils/logger";
+import { logger } from "./infra.utils/logger";
 
 // 15.1 log process-level crashes  (not related to http requests)
 // Handle uncaught exceptions (synchronous errors)

@@ -1,13 +1,29 @@
 //5.1
+//Goal:
+//Flow:
+//Clean:
+//best practices:
+// No HTTP concepts
+// No ORM leakage
+// Domain-level field names (fields, select,include)
+//    mapRow maps DB fields to domain model.
+// Partial updates
+// id always selected
+//  buildSelectFields handles fields array and always selects id
+// Flat QueryInput usage (offset, limit)
+// includeArtist flag
+// buildSelectFields
+
 import { ResultSetHeader } from "mysql2/promise";
 import { randomUUID } from "crypto";
-import {logger} from "../../utils/logger";
+import {logger} from "../../infra.utils/logger";
 import { pool } from "./db";
 import { SongCreateInput } from "../../domainModels/song/songCreateInput";
-import { SongQuery } from "../../domainModels/song/songQuery";
-import { SongsQuery } from "../../domainModels/song/songsQuery";
 import { Song } from "../../domainModels/song/song";
 import { SongUpdateInput } from "../../domainModels/song/songUpdateInput";
+import { QueryInput } from "../../domainModels/queryInput";
+//import { SongQuery } from "../../domainModels/song/songQuery";
+//import { SongsQuery } from "../../domainModels/song/songsQuery";
 
 
 /**
@@ -22,7 +38,7 @@ function mapRow(row: any, includeArtist: boolean = true): Song {
     url: row.url,                  // undefined when not selected, null when explicitly null in DB
   };
 
-  if (includeArtist && row.artist_id && row.artist_name) {
+  if (includeArtist && row.artist_id) {
     song.artist = {
       id: row.artist_id,
       name: row.artist_name,
@@ -79,7 +95,8 @@ function buildSelectFields(
  * @param query - Optional query parameters for filtering, sorting, pagination, and field selection
  * @param query.fields - Optional field selection (title, url, artistId). id is always returned
  * @param query.include - Optional expansion options (e.g., artist information)
- * @param query.pagination - Optional pagination (limit, offset). When omitted, all items are returned. Default values are set by controller
+ * @param query.offset - Optional pagination (limit, offset). When omitted, all items are returned. Default values are set by controller
+ * @param query.limit - Optional pagination (limit, offset). When omitted, all items are returned. Default values are set by controller
  * @param query.sort - Optional sorting array (e.g., ["title", "-artistId"]). Fields validated in service layer
  * @returns Array of Song objects. Empty array if no songs found
  * @throws Database errors may be thrown (handled by error middleware)
@@ -87,12 +104,13 @@ function buildSelectFields(
  * @example
  * // Get all songs with pagination and sorting
  * const songs = await getAllSongs({
- *   pagination: { limit: 20, offset: 0 },
+ *    limit: 20, 
+ *   offset: 0 ,
  *   sort: ["title", "-artistId"],
  *   include: ['artist']
  * });
  */
-export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
+export async function getAllSongs(query?: QueryInput): Promise<Song[]> {
   const includeArtist = query?.include?.includes('artist') ?? false;
   const select = buildSelectFields(query?.fields, includeArtist); // Build the SELECT clause based on requested fields
 
@@ -106,7 +124,7 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
     sql += " LEFT JOIN artists a ON s.artist_id = a.id";
   }
 
-  // Handle sorting if provided
+  // Handle sorting if provided (using names from domain)
   // Note: Sort fields are validated in domain service layer (whitelist)
   if (query?.sort && query.sort.length > 0) {
     const sortFields = query.sort.map(field => {
@@ -116,12 +134,14 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
       // Map domain field names to database column names
       // Security: Whitelist prevents SQL injection - only allow known fields
       const dbFieldMap: Record<string, string> = {
-        'id': 's.id',
-        'title': 's.title',
-        'url': 's.url',
-        'artistId': 's.artist_id',
-        'artist_name': 'a.name'
+        id: 's.id',
+        title: 's.title',
+        url: 's.url',
+        artistId: 's.artist_id',
+        artistName: 'a.name',
       };
+
+     
       
       // Security: Throw error if field not in whitelist (defense in depth)
       // Service layer validates, but repository should also enforce
@@ -139,9 +159,9 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
     // Handle pagination if provided
     // Note: controller sets defaults
     //Note:  validation made in request validation middleware and service
-    if (query?.pagination) {
+    if (query?.limit !== undefined && query?.offset !== undefined) {
       sql += " LIMIT ? OFFSET ?";
-      params.push(query.pagination.limit, query.pagination.offset);
+      params.push(query.limit, query.offset);
     }
 
   // Execute query with the parameters
@@ -172,7 +192,7 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
  *   fields: ['title', 'url']
  * });
  */
-export async function getSongById(id: string, query?: SongQuery): Promise<Song | null> {
+export async function getSongById(id: string, query?: QueryInput): Promise<Song | null> {
   const includeArtist = query?.include?.includes('artist') ?? false;
   const select = buildSelectFields(query?.fields, includeArtist);
 

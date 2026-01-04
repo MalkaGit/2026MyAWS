@@ -1,45 +1,27 @@
 //7
+//Goal:
+//Clean
+// 1. using Generic validator (QueryInputValidator)
+// 2. Constants at top for allowed fields, sort fields, and includes — easy to maintain for other entities.
+// 3. controller handles defaults (offset/limit), 
+
+import { QueryInputValidator, FieldDependencyMap } from "./shared/QueryInputValidator";
 import { SongCreateInput } from "../domainModels/song/songCreateInput";
-import { SongQuery } from "../domainModels/song/songQuery";
-import { SongsQuery } from "../domainModels/song/songsQuery";
 import { Song } from "../domainModels/song/song";
 import { SongUpdateInput } from "../domainModels/song/songUpdateInput";
-import * as songRepo from "../infra.repositories/mySqlDB.mysql2/songRepository";
+import { QueryInput } from "../domainModels/queryInput";
 import { BadRequestError, NotFoundError, DomainErrorCode } from "../domainErrors/domainErrors";
+import * as songRepo from "../infra.repositories/mySqlDB.mysql2/songRepository";
 
-const ALLOWED_SORT_FIELDS = ['id', 'title', 'url', 'artistId', 'artist_name'];
+// --- Allowed constants ---
+const ALLOWED_FIELDS = ['id', 'title', 'url', 'artistId', 'artistName'];
+const ALLOWED_SORT_FIELDS = ['id', 'title', 'url', 'artistId', 'artistName'];
+const ALLOWED_INCLUDES = ['artist'];
+const FIELD_INCLUDE_DEPENDENCIES: FieldDependencyMap = {
+  artistName: ['artist'], // selecting or sorting by artistName requires include=artist
+};
 
-/**
- * Validates sort fields against whitelist and ensures related entity includes are specified
- * 
- * @param sort - Optional array of field names for sorting (e.g., ['title', '-artistId']). 
- *               Prefix field with '-' for descending order. When omitted or empty, validation is skipped.
- * @param include - Optional array of related entity names to include (e.g., ['artist']). 
- *                 When omitted or empty, no related entities are included.
- * @throws BadRequestError if invalid sort fields are provided or if sorting by related entity fields without include
- */
-function validateSortFields(sort?: string[], include?: string[]): void {
-  if (!sort || sort.length === 0) return;
 
-  const fields = sort.map(field => {
-    return field.startsWith('-') ? field.slice(1) : field;
-  });
-
-  const invalidFields = fields.filter(field => !ALLOWED_SORT_FIELDS.includes(field));
-  if (invalidFields.length > 0) {
-    throw new BadRequestError(
-      DomainErrorCode.INVALID_SORT_VALUE,
-      `Invalid sort fields: ${invalidFields.join(', ')}. Allowed fields: ${ALLOWED_SORT_FIELDS.join(', ')}`
-    );
-  }
-
-  if (fields.includes('artist_name') && !include?.includes('artist')) {
-    throw new BadRequestError(
-      DomainErrorCode.MISSING_INCLUDE_VALUE,
-      'Sorting by artist_name requires include=artist. Please add ?include=artist to your request.'
-    );
-  }
-}
 
 /**
  * Get all songs with optional filtering, sorting, pagination, and field selection
@@ -49,15 +31,28 @@ function validateSortFields(sort?: string[], include?: string[]): void {
  *                       When omitted or empty, all fields are returned. id is always returned (industry best practice).
  * @param query.include - Optional array of related entity names to include (e.g., ['artist']). 
  *                        When omitted or empty, no related entities are included.
- * @param query.pagination - Optional pagination (limit, offset). When omitted, all items are returned. Controller will set defaults if not provided.
- * @param query.sort - Optional array of field names for sorting (e.g., ['title', '-artistId']). 
+ * @param query.offset - Optional pagination (limit, offset). When omitted, all items are returned. Controller will set defaults if not provided.
+ * @param query.limit - Optional pagination (limit, offset). When omitted, all items are returned. Controller will set defaults if not provided.
+* @param query.sort - Optional array of field names for sorting (e.g., ['title', '-artistId']). 
  *                     Prefix field with '-' for descending order. Fields validated against whitelist.
  *                     When omitted or empty, no sorting is applied (default order).
  * @returns Array of Song objects. Empty array if no songs found
  * @throws BadRequestError if invalid sort fields are provided or if sorting by related entity fields without include
  */
-export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
-  validateSortFields(query?.sort, query?.include);
+export async function getAllSongs(query?: QueryInput): Promise<Song[]> {
+  //refine the query input
+  const refinedQuery: QueryInput = {
+    ...query,
+    limit: query?.limit ?? 20,
+    offset: query?.offset ?? 0,
+    sort: query?.sort?.length ? query.sort : ['id'],
+  };
+
+  // Validate query input: fields, sort, include
+  QueryInputValidator.validate(query,
+    ALLOWED_FIELDS,ALLOWED_SORT_FIELDS,ALLOWED_INCLUDES,FIELD_INCLUDE_DEPENDENCIES
+  );
+
   const songs = await songRepo.getAllSongs(query);
   return songs;
 }
@@ -77,9 +72,11 @@ export async function getAllSongs(query?: SongsQuery): Promise<Song[]> {
  * @returns Song entity
  * @throws NotFoundError if song is not found
  */
-export async function getSongById(id: string, query?: SongQuery): Promise<Song> {
-  const song = await songRepo.getSongById(id, query);
+export async function getSongById(id: string, query?: QueryInput): Promise<Song> {
+  QueryInputValidator.validate( query,
+    ALLOWED_FIELDS,ALLOWED_SORT_FIELDS,ALLOWED_INCLUDES,FIELD_INCLUDE_DEPENDENCIES);
 
+  const song = await songRepo.getSongById(id, query);
   if (!song) {
     throw new NotFoundError(DomainErrorCode.SONG_NOT_EXIST, `Song with id ${id} not found`);
   }

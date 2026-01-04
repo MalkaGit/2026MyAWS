@@ -9,6 +9,13 @@
  * - Used for programmatic error handling by API consumers
  */
 export enum DomainErrorCode {
+
+  // ForbiddenError codes (403) - if needed in future
+  // PERMISSION_DENIED = "PERMISSION_DENIED",
+  
+  // ConflictError codes (409) - if needed in future
+  // DUPLICATE_SONG = "DUPLICATE_SONG",
+  
   // BadRequestError codes (400)
   INVALID_FIELDS_VALUE            = "INVALID_FIELDS_VALUE",
   INVALID_INCLUDE_VALUE           = "INVALID_INCLUDE_VALUE",
@@ -20,12 +27,6 @@ export enum DomainErrorCode {
   ARTIST_NOT_EXIST = "ARTIST_NOT_EXIST",
   SONG_NOT_EXIST   = "SONG_NOT_EXIST",
  
-
-  // ForbiddenError codes (403) - if needed in future
-  // PERMISSION_DENIED = "PERMISSION_DENIED",
-  
-  // ConflictError codes (409) - if needed in future
-  // DUPLICATE_SONG = "DUPLICATE_SONG",
 }
 
 /**
