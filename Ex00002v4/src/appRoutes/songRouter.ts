@@ -47,7 +47,7 @@ songRouter.get(
   '/:id',
   createRequestValidator({
     params: songParamsSchema,
-    query: QueryByIdInputSchema.optional(),
+    query: QueryByIdInputSchema,
   }),
   songController.getSongById
 );

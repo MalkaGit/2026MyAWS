@@ -1,12 +1,11 @@
-Clean
-    
-
+Gol 
     Helper  functions  (usally, library wrappers)
     No connections, no external calls
     can be used by all layers
         (so we can switch libray without chaning or testing consumers)
     usually provide abstract api that is library agnostic   
         so consumers do no chnage as we change wrapped library    
+clean:  
     db agnotstic, shuld not change as we switch db
     cloud agnostic, should not chnage as we switch cloud provider
     fw agnistic, should not change as we switch fw (Express, NextJs, Fastify)

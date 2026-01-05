@@ -52,9 +52,12 @@ export function requestLoggerMiddleware (req: Request, res: Response, next: Next
    */
   res.on('finish', () => {
     const durationMs = Date.now() - startTime;
+    // Build complete URL with query string
+    const fullUrl = req.originalUrl || req.url || req.path;
     const logData = {
       method: req.method,
-      path: req.route?.path || req.path || req.url,  //avoid printing query string
+      url: fullUrl,  // Complete URL including query parameters
+      path: req.route?.path || req.path,  // Route pattern (for reference)
       statusCode: res.statusCode,
       durationMs,
       // These come from request context (AsyncLocalStorage)

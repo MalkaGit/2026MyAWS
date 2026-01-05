@@ -19,12 +19,21 @@ import { z } from 'zod';
 
 export const QueryByIdInputSchema = z.object({
   fields: z
-    .string()
-    .optional()
-    .transform((s) => (s ? s.split(',').map((f) => f.trim()) : [])), // return empty array if undefined
+    .preprocess(
+      (value) =>
+        typeof value === "string"
+          ? value.split(",").map(v => v.trim()).filter(Boolean)
+          : value,
+      z.array(z.string()).optional()
+    ),
 
   include: z
-    .string()
-    .optional()
-    .transform((s) => (s ? s.split(',').map((f) => f.trim()) : [])), // return empty array if undefined
-});
+    .preprocess(
+      (value) =>
+        typeof value === "string"
+          ? value.split(",").map(v => v.trim()).filter(Boolean)
+          : value,
+      z.array(z.string()).optional()
+    ),
+})
+.strict(); // no other fields

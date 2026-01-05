@@ -1,8 +1,12 @@
 //7
 //Goal:
+// 1. apply defaults to the query input
+// 2. validate the query input
+// 3. call the repository 
+
 //Clean
-// 1. using Generic validator (QueryInputValidator)
-// 2. Constants at top for allowed fields, sort fields, and includes — easy to maintain for other entities.
+// 1. Constants at top for allowed fields, sort fields, and includes — easy to maintain for other entities.
+// 2. using reusable validator for the query input 
 // 3. controller handles defaults (offset/limit), 
 
 import { QueryInputValidator, FieldDependencyMap } from "./shared/QueryInputValidator";
@@ -20,8 +24,9 @@ const ALLOWED_INCLUDES = ['artist'];
 const FIELD_INCLUDE_DEPENDENCIES: FieldDependencyMap = {
   artistName: ['artist'], // selecting or sorting by artistName requires include=artist
 };
-
-
+const DEFFAULT_LIMIT : number = 20;
+const DEFFAULT_OFFSET : number = 0;
+const DEFFAULT_SORT : string[] = ['id'];
 
 /**
  * Get all songs with optional filtering, sorting, pagination, and field selection
@@ -42,18 +47,18 @@ const FIELD_INCLUDE_DEPENDENCIES: FieldDependencyMap = {
 export async function getAllSongs(query?: QueryInput): Promise<Song[]> {
   //refine the query input
   const refinedQuery: QueryInput = {
-    ...query,
-    limit: query?.limit ?? 20,
-    offset: query?.offset ?? 0,
-    sort: query?.sort?.length ? query.sort : ['id'],
+    ...(query ?? {}),
+    limit: query?.limit ?? DEFFAULT_LIMIT,
+    offset: query?.offset ?? DEFFAULT_OFFSET,
+    sort: query?.sort?.length ? query.sort : DEFFAULT_SORT,
   };
 
   // Validate query input: fields, sort, include
-  QueryInputValidator.validate(query,
+  QueryInputValidator.validate(refinedQuery,
     ALLOWED_FIELDS,ALLOWED_SORT_FIELDS,ALLOWED_INCLUDES,FIELD_INCLUDE_DEPENDENCIES
   );
 
-  const songs = await songRepo.getAllSongs(query);
+  const songs = await songRepo.getAllSongs(refinedQuery);
   return songs;
 }
 

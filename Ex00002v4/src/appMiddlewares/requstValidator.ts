@@ -36,17 +36,24 @@ export function createRequestValidator(schemas: {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       if (schemas.body) {
-        req.body = schemas.body.parse(req.body);  //req.body: any 
-      }
-
-      if (schemas.query) {
-        req.query = schemas.query.parse(req.query) as Request['query']; //req.query: ParsedQs 
+        //store parsed data in  req.body (of type any) 
+        req.body = schemas.body.parse(req.body);
       }
 
       if (schemas.params) {
-        req.params = schemas.params.parse(req.params) as Request['params']; //req.params: ParamsDictionary
+        //store parsed data in req.params (of type ParamsDictionary)
+        req.params = schemas.params.parse(req.params) as Request['params'];
       }
 
+      if (schemas.query) {
+        // Parse and validate query parameters
+        const parsedQuery = schemas.query.parse(req.query) as Record<string, any>;
+        //Express does not allow oveeriing req.query,
+        // so we store the parsed data in a custom property
+        (req as any).validatedQuery = parsedQuery;
+      }
+
+    
       next();
     } catch (err) {
       next(err);

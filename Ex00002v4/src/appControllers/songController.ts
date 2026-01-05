@@ -19,7 +19,8 @@ export async function getAllSongs(
   next: NextFunction
 ) {
   try {
-    const query = req.query as QueryInput; // Already typed and parsed by middleware
+    // Use validatedQuery if available (from validation middleware), otherwise fall back to req.query
+    const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
     const songs = await songService.getAllSongs(query);
     res.status(200).json(songs);
   } catch (err) {
@@ -43,7 +44,8 @@ export async function getSongById(
 ) {
   try {
     const { id } = req.params as { id: string };
-    const query = req.query as QueryInput;
+    // Use validatedQuery if available (from validation middleware), otherwise fall back to req.query
+    const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
     const song = await songService.getSongById(id, query);
     res.status(200).json(song);
   } catch (err) {
