@@ -30,11 +30,12 @@ songRouter.post(
 /**
  * GET /songs
  * Query: pagination (limit, offset), sorting, fields, include (optional)
+ * when query string not provided, zod returs undefied
  */
 songRouter.get(
   '/',
   createRequestValidator({ 
-    query: QueryInputSchema.optional() 
+    query: QueryInputSchema 
   }),
   songController.getAllSongs
 );
@@ -42,6 +43,7 @@ songRouter.get(
 /**
  * GET /songs/:id
  * Query: fields, include (optional)
+ * when query string not provided, zod returs undefined
  */
 songRouter.get(
   '/:id',

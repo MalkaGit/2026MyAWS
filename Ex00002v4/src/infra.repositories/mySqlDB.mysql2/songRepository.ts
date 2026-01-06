@@ -21,7 +21,7 @@ import { pool } from "./db";
 import { SongCreateInput } from "../../domainModels/song/songCreateInput";
 import { Song } from "../../domainModels/song/song";
 import { SongUpdateInput } from "../../domainModels/song/songUpdateInput";
-import { QueryInput } from "../../domainModels/queryInput";
+import { QueryInput } from "../../domainModels/common/queryInput";
 //import { SongQuery } from "../../domainModels/song/songQuery";
 //import { SongsQuery } from "../../domainModels/song/songsQuery";
 

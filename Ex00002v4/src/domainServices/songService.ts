@@ -13,7 +13,7 @@ import { QueryInputValidator, FieldDependencyMap } from "./shared/QueryInputVali
 import { SongCreateInput } from "../domainModels/song/songCreateInput";
 import { Song } from "../domainModels/song/song";
 import { SongUpdateInput } from "../domainModels/song/songUpdateInput";
-import { QueryInput } from "../domainModels/queryInput";
+import { QueryInput } from "../domainModels/common/queryInput";
 import { BadRequestError, NotFoundError, DomainErrorCode } from "../domainErrors/domainErrors";
 import * as songRepo from "../infra.repositories/mySqlDB.mysql2/songRepository";
 
@@ -47,7 +47,8 @@ const DEFFAULT_SORT : string[] = ['id'];
 export async function getAllSongs(query?: QueryInput): Promise<Song[]> {
   //refine the query input
   const refinedQuery: QueryInput = {
-    ...(query ?? {}),
+    fields: query?.fields,
+    include: query?.include,
     limit: query?.limit ?? DEFFAULT_LIMIT,
     offset: query?.offset ?? DEFFAULT_OFFSET,
     sort: query?.sort?.length ? query.sort : DEFFAULT_SORT,
@@ -78,7 +79,7 @@ export async function getAllSongs(query?: QueryInput): Promise<Song[]> {
  * @throws NotFoundError if song is not found
  */
 export async function getSongById(id: string, query?: QueryInput): Promise<Song> {
-  QueryInputValidator.validate( query,
+  QueryInputValidator.validate(query,
     ALLOWED_FIELDS,ALLOWED_SORT_FIELDS,ALLOWED_INCLUDES,FIELD_INCLUDE_DEPENDENCIES);
 
   const song = await songRepo.getSongById(id, query);

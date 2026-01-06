@@ -4,7 +4,7 @@
 
 
 import { BadRequestError, DomainErrorCode } from "../../domainErrors/domainErrors";
-import { QueryInput } from "../../domainModels/queryInput";
+import { QueryInput } from "../../domainModels/common/queryInput";
 
 export type FieldDependencyMap = Record<string, string[]>; 
 // key = field name (domain) from fields or sort

@@ -1,26 +1,29 @@
 //9.1
 // Thin controller layer: extracts validated data from req.validated, calls service, returns HTTP response
+// Critical: using TypedRequest instead of Request that requires using as and any cast
+import { TypedRequest } from "../appTypes/express";  //<body,params,query>
 import { Request, Response, NextFunction } from "express";
-import { QueryInput } from "../domainModels/queryInput";
+import { QueryInput } from "../domainModels/common/queryInput";
 import { SongCreateInput } from "../domainModels/song/songCreateInput";
 import { SongUpdateInput } from "../domainModels/song/songUpdateInput";
 import * as songService from "../domainServices/songService";
-
 
 
 /**
  * GET /songs
  * Returns a list of songs, with optional pagination, sorting, field selection, and includes.
  * Note: getAllsongs and getSongById use different schema  but in the end we use the same model (QueryInput)  
- */
+*/
 export async function getAllSongs(
-  req: Request,
+  req: TypedRequest<any, any, QueryInput>, //instead untyped request 
   res: Response,
   next: NextFunction
 ) {
   try {
-    // Use validatedQuery if available (from validation middleware), otherwise fall back to req.query
-    const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
+    // Query string is optional (all fields in QueryInputSchema are optional)
+    // If user sends no query string: Zod returns undefined (not object with all fields undefined)
+    // If user sends query string: validatedQuery is a QueryInput object
+    const query :QueryInput | undefined = req.validatedQuery;
     const songs = await songService.getAllSongs(query);
     res.status(200).json(songs);
   } catch (err) {
@@ -38,14 +41,16 @@ export async function getAllSongs(
  * Errors → errorMiddleware (NotFoundError) 
 */
 export async function getSongById(
-  req: Request,
+  req: TypedRequest<any, { id: string }, QueryInput>,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { id } = req.params as { id: string };
-    // Use validatedQuery if available (from validation middleware), otherwise fall back to req.query
-    const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
+    const { id } = req.params; // No 'as' needed - req.params is already typed   (req.params as {id:string})
+    // Query string is optional (all fields in QueryByIdInputSchema are optional)
+    // If user sends no query string: Zod returns undefined (not object with all fields undefined)
+    // If user sends query string: validatedQuery is a QueryInput object
+    const query :QueryInput | undefined = req.validatedQuery;
     const song = await songService.getSongById(id, query);
     res.status(200).json(song);
   } catch (err) {
@@ -62,12 +67,12 @@ export async function getSongById(
  * Errors → errorMiddleware (BadRequestError) 
 */
 export async function createSong(
-  req: Request,
+  req: TypedRequest<SongCreateInput>,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const input = req.body as SongCreateInput;
+    const input :SongCreateInput = req.body; // No 'as' needed - req.body is already typed as SongCreateInput
     const id = await songService.createSong(input);
     res.status(201).json({ id });
   } catch (err) {
@@ -86,13 +91,13 @@ export async function createSong(
  * Errors → errorMiddleware (NotFoundError, BadRequestError)
 */
 export async function updateSong(
-  req: Request,
+  req: TypedRequest<SongUpdateInput, { id: string }>,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { id } = req.params as { id: string };
-    const input = req.body as SongUpdateInput;
+    const { id } = req.params; // No 'as' needed - req.params is already typed   (req.params as {id:string})
+    const input :SongUpdateInput = req.body; // No 'as' needed - req.body is already typed as SongUpdateInput
     await songService.updateSong(id, input);
     res.status(204).send();
   } catch (err) {
@@ -110,12 +115,13 @@ export async function updateSong(
  * Errors → errorMiddleware (NotFoundError)
 */
 export async function deleteSong(
-  req: Request,
+  req: TypedRequest<any, { id: string }>,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { id } = req.params as { id: string };
+    
+    const { id } = req.params; // No 'as' needed - req.params is already typed   (req.params as {id:string})
     await songService.deleteSong(id);
     res.status(204).send();
   } catch (err) {

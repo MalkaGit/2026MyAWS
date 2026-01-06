@@ -2,6 +2,8 @@
  * QueryInput request schema
  *  *  - Endpoint: Get /songs
  *  -  Model: QueryInput (no DTO, this is domain model))
+ *  - Note:
+ *    - when query string not provided, zod returns undefined (not object with all fields undefined) 
  * 
  * Responsibility:
  * - Parse query string values (string → number / string[])
@@ -9,7 +11,7 @@
  * - Validate basic structure and types
  * - No business rules (those belong to service / domain validators)
  *      eg, does not validate the values of fields, sort, include
- */
+*/
 
 import { z } from "zod";
 
@@ -21,10 +23,17 @@ export const QueryInputSchema = z.object({
    */
   fields: z
     .preprocess(
-      (value) =>
-        typeof value === "string"
-          ? value.split(",").map(v => v.trim()).filter(Boolean)   //Boolean - removes empty strings
-          : value,
+      (value) => {
+        if (typeof value === "string") {
+          return value.split(",").map(v => v.trim()).filter(Boolean);   //Boolean - removes empty strings
+        }
+        if (Array.isArray(value)) {
+          // Express already parsed it as an array (e.g., ?fields[]=title&fields[]=url)
+          return value.map(v => String(v).trim()).filter(Boolean);
+        }
+        // undefined or other types - pass through (undefined handled by .optional(), others will fail validation)
+        return value;
+      },
       z.array(z.string()).optional()
     ),
 
@@ -35,10 +44,16 @@ export const QueryInputSchema = z.object({
    */
   include: z
     .preprocess(
-      (value) =>
-        typeof value === "string"
-          ? value.split(",").map(v => v.trim()).filter(Boolean)
-          : value,
+      (value) => {
+        if (typeof value === "string") {
+          return value.split(",").map(v => v.trim()).filter(Boolean);
+        }
+        if (Array.isArray(value)) {
+          // Express already parsed it as an array
+          return value.map(v => String(v).trim()).filter(Boolean);
+        }
+        return value;
+      },
       z.array(z.string()).optional()
     ),
 
@@ -49,10 +64,16 @@ export const QueryInputSchema = z.object({
    */
   sort: z
     .preprocess(
-      (value) =>
-        typeof value === "string"
-          ? value.split(",").map(v => v.trim()).filter(Boolean)
-          : value,
+      (value) => {
+        if (typeof value === "string") {
+          return value.split(",").map(v => v.trim()).filter(Boolean);
+        }
+        if (Array.isArray(value)) {
+          // Express already parsed it as an array
+          return value.map(v => String(v).trim()).filter(Boolean);
+        }
+        return value;
+      },
       z.array(z.string()).optional()
     ),
 
@@ -73,7 +94,13 @@ export const QueryInputSchema = z.object({
       z.number().int().min(0).optional()
     ),
 })
-.strict(); //no other fields
+.strict() //no other fields
+.transform((data) => {
+  // If all fields are undefined/empty, return undefined instead of object with all undefined fields
+  const hasAnyValue = data.fields?.length || data.include?.length || data.sort?.length || 
+                      data.limit !== undefined || data.offset !== undefined;
+  return hasAnyValue ? data : undefined;
+});
 
 
 /**

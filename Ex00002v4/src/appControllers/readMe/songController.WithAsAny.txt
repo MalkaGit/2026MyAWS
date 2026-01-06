@@ -1,0 +1,138 @@
+// OLD CODE - Using 'as' and 'as any' type assertions
+// This file documents the previous approach before implementing TypedRequest
+// Current code uses TypedRequest from appTypes/express.d.ts (industry-standard approach)
+
+// ============================================================================
+// OLD IMPORTS
+// ============================================================================
+import { Request, Response, NextFunction } from "express";
+import { QueryInput } from "../domainModels/queryInput";
+import { SongCreateInput } from "../domainModels/song/songCreateInput";
+import { SongUpdateInput } from "../domainModels/song/songUpdateInput";
+// OLD: No TypedRequest import
+import * as songService from "../domainServices/songService";
+
+
+// ============================================================================
+// OLD: getAllSongs - Using 'as any' and 'as' assertions
+// ============================================================================
+export async function getAllSongs(
+  req: Request,  // OLD: Just Request, not TypedRequest
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    // OLD: Required 'as any' to access validatedQuery, then 'as QueryInput' to type it
+    const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
+    const songs = await songService.getAllSongs(query);
+    res.status(200).json(songs);
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+// ============================================================================
+// OLD: getSongById - Using 'as any' and 'as' assertions
+// ============================================================================
+export async function getSongById(
+  req: Request,  // OLD: Just Request, not TypedRequest
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    // OLD: Required 'as { id: string }' to type params
+    const { id } = req.params as { id: string };
+    // OLD: Required 'as any' to access validatedQuery, then 'as QueryInput' to type it
+    const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
+    const song = await songService.getSongById(id, query);
+    res.status(200).json(song);
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+// ============================================================================
+// OLD: createSong - Using 'as' assertion (line 70 - the original question)
+// ============================================================================
+export async function createSong(
+  req: Request,  // OLD: Just Request, not TypedRequest<SongCreateInput>
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    // OLD: Required 'as SongCreateInput' to type req.body (this was line 70)
+    const input = req.body as SongCreateInput;
+    const id = await songService.createSong(input);
+    res.status(201).json({ id });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+// ============================================================================
+// OLD: updateSong - Using 'as' assertions
+// ============================================================================
+export async function updateSong(
+  req: Request,  // OLD: Just Request, not TypedRequest
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    // OLD: Required 'as { id: string }' to type params
+    const { id } = req.params as { id: string };
+    // OLD: Required 'as SongUpdateInput' to type req.body
+    const input = req.body as SongUpdateInput;
+    await songService.updateSong(id, input);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+// ============================================================================
+// OLD: deleteSong - Using 'as' assertion
+// ============================================================================
+export async function deleteSong(
+  req: Request,  // OLD: Just Request, not TypedRequest
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    // OLD: Required 'as { id: string }' to type params
+    const { id } = req.params as { id: string };
+    await songService.deleteSong(id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+// ============================================================================
+// SUMMARY OF CHANGES
+// ============================================================================
+// 
+// PROBLEMS WITH OLD APPROACH:
+// 1. Type assertions ('as') bypass TypeScript's type checking
+// 2. 'as any' completely disables type safety
+// 3. No compile-time guarantee that types are correct
+// 4. Easy to make mistakes - if validation fails, types are wrong but no error
+// 5. Code is less maintainable - types are scattered throughout controllers
+//
+// NEW APPROACH (Current):
+// 1. TypedRequest<TBody, TParams, TQuery> provides compile-time type safety
+// 2. No 'as' or 'as any' needed - types are inferred from generics
+// 3. Type safety is enforced at the function signature level
+// 4. Better IDE autocomplete and error detection
+// 5. Industry-standard pattern used by express-validator and similar libraries
+//
+// KEY IMPROVEMENTS:
+// - createSong: req: TypedRequest<SongCreateInput> → req.body is already typed
+// - updateSong: req: TypedRequest<SongUpdateInput, { id: string }> → both typed
+// - getSongById: req: TypedRequest<any, { id: string }, QueryInput> → all typed
+// - validatedQuery: Properly typed via declaration merging, no 'as any' needed
+

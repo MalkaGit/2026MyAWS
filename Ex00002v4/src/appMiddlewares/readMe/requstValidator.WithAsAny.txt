@@ -1,0 +1,116 @@
+// OLD CODE - Using 'as any' type assertion for validatedQuery
+// This file documents the previous approach before implementing proper type declarations
+// Current code uses declaration merging in appTypes/express.d.ts (industry-standard approach)
+
+// ============================================================================
+// OLD CODE - requstValidator.ts
+// ============================================================================
+
+import { Request, Response, NextFunction } from 'express';
+import { ZodTypeAny } from 'zod';
+
+export function createRequestValidator(schemas: {
+  body?: ZodTypeAny;
+  query?: ZodTypeAny;
+  params?: ZodTypeAny;
+}) {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    try {
+      if (schemas.body) {
+        //store parsed data in  req.body (of type any) 
+        req.body = schemas.body.parse(req.body);
+      }
+
+      if (schemas.params) {
+        //store parsed data in req.params (of type ParamsDictionary)
+        req.params = schemas.params.parse(req.params) as Request['params'];
+      }
+
+      if (schemas.query) {
+        // Parse and validate query parameters
+        const parsedQuery = schemas.query.parse(req.query) as Record<string, any>;
+        //Express does not allow oveeriing req.query,
+        // so we store the parsed data in a custom property
+        // OLD: Required 'as any' because TypeScript doesn't know about validatedQuery property
+        (req as any).validatedQuery = parsedQuery;
+      }
+
+    
+      next();
+    } catch (err) {
+      next(err);
+    }
+  };
+}
+
+
+// ============================================================================
+// WHY THE OLD APPROACH WAS NEEDED
+// ============================================================================
+//
+// PROBLEM:
+// Express's req.query is read-only in TypeScript (it's a ParsedQs type that can't be reassigned).
+// So we needed to store validated query parameters in a custom property.
+//
+// OLD SOLUTION:
+// - Used (req as any).validatedQuery to bypass TypeScript's type checking
+// - This worked but lost all type safety
+// - Controllers had to use (req as any).validatedQuery everywhere
+//
+// ISSUES WITH OLD APPROACH:
+// 1. 'as any' completely disables type checking
+// 2. No autocomplete for validatedQuery property
+// 3. Easy to make typos (e.g., validatedQuerry) with no compile-time error
+// 4. Type information is lost - validatedQuery is typed as 'any'
+// 5. Controllers need additional 'as QueryInput' assertions
+
+
+// ============================================================================
+// NEW APPROACH (Current)
+// ============================================================================
+//
+// SOLUTION:
+// Use TypeScript declaration merging to extend Express's Request interface.
+// This is the industry-standard approach used by libraries like express-validator.
+//
+// IMPLEMENTATION:
+// 1. Created appTypes/express.d.ts with:
+//    - Global declaration merging to add validatedQuery to Express.Request
+//    - TypedRequest<TBody, TParams, TQuery> generic interface
+//
+// 2. Updated middleware:
+//    - Changed: (req as any).validatedQuery = parsedQuery;
+//    - To: req.validatedQuery = parsedQuery;  // Now properly typed!
+//
+// 3. Updated controllers:
+//    - Changed: ((req as any).validatedQuery ?? req.query) as QueryInput;
+//    - To: req.validatedQuery ?? req.query;  // Fully typed via TypedRequest!
+//
+// BENEFITS:
+// 1. Full type safety - no 'as any' needed
+// 2. Autocomplete works for validatedQuery
+// 3. Compile-time errors for typos
+// 4. Type information preserved through TypedRequest generics
+// 5. Industry-standard pattern that other developers will recognize
+
+
+// ============================================================================
+// COMPARISON
+// ============================================================================
+//
+// OLD (Middleware):
+//   (req as any).validatedQuery = parsedQuery;
+//
+// NEW (Middleware):
+//   req.validatedQuery = parsedQuery;  // TypeScript knows this property exists
+//
+// OLD (Controller):
+//   const query = ((req as any).validatedQuery ?? req.query) as QueryInput;
+//
+// NEW (Controller):
+//   req: TypedRequest<any, any, QueryInput>
+//   const query = req.validatedQuery ?? req.query;  // Already typed as QueryInput!
+//
+// The key difference: TypeScript now understands validatedQuery exists and knows its type
+// through the TypedRequest generic, eliminating the need for any type assertions.
+
