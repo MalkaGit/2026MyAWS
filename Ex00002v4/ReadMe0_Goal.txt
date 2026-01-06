@@ -22,9 +22,23 @@ Sanity
 
     Get by id 
     http://localhost:3000/api/songs/0ca937e2-4b2e-491b-9b43-0a80d71b6a9d?fields=title,url&include=artist
-
+        http://localhost:3000/api/songs/0ca937e2-4b2e-491b-9b43-0a80d71b6a9d?fields=title
 
     Get All with paging
     http://localhost:3000/api/songs?sort=id&offset=0&limit=3&fields=title,url&include=artist
  
 
+
+
+     Get by id  errors
+     http://localhost:3000/api/songs/0ca937e2-4b2e-491b-9b43-0a80d71b6a9d?fieldsssa=title
+     bad request (feidlsss)
+     {
+    "code": "REQUEST_VALIDATION_FAILED",
+    "errors": [
+        {
+            "field": "root",
+            "code": "unrecognized_keys"
+        }
+    ]
+}
