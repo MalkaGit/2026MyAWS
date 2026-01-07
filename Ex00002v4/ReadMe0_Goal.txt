@@ -1,7 +1,20 @@
 TOD: REFINE the layers by ther readme in the layes 
 Goal 
     monolith app 
+    run locally - songs agains MySql without ORM 
+
+    features: 
+        - request context 
+        - auth middleware 
+        - request validator (using zod to get typed request)
+        - request logging 
+
+    skipped: where query support 
+    skipped: complete JWT (assued behind api gw)
+
+
     Good:
+    - avoid as , any 
     - less interface 
     - api i can reuse (replace repo without chaning deoman)
     - seperation - idea is good but folder structure makes it hard to refactor to microsercies 
