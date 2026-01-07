@@ -1,4 +1,4 @@
-//9.4, 14.1
+//9.4, 14.1, 19.4
 /**
  * Goal
  *  Global error middleware 
@@ -41,6 +41,7 @@ import { logger } from "../infra.utils/logger";
 import { requestContext } from "../infra.utils/request-context";
 import {
   DomainError,
+  UnauthorizedError,
   BadRequestError,
   NotFoundError,
   ForbiddenError,
@@ -130,8 +131,9 @@ function mapZodErrorToDtoError(error: ZodError): FieldErrorDto[] {
  */
 function getDomainErrorStatusCode(err: DomainError): number {
   if (err instanceof BadRequestError) return 400;
+  if (err instanceof UnauthorizedError) return 401; //not authenticated 
+  if (err instanceof ForbiddenError) return 403;    //not authorized
   if (err instanceof NotFoundError) return 404;
-  if (err instanceof ForbiddenError) return 403;
   if (err instanceof ConflictError) return 409;
   // Fallback (should never happen if all domain errors are properly handled)
   return 500;

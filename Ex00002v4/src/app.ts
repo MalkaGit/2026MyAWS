@@ -29,6 +29,7 @@ import express from "express";
 //import cors from "cors";
 //import morgan from "morgan";
 import {requestContextMiddleware} from "./appMiddlewares/requestContext";
+import {authMiddleware} from "./appMiddlewares/authMiddleware";
 import {requestLoggerMiddleware} from "./appMiddlewares/requestLogger";
 import { errorMiddleware } from "./appMiddlewares/errorHandler";
 import songRouter from "./appRoutes/songRouter";
@@ -44,7 +45,8 @@ app.use (requestContextMiddleware);
 // Parse JSON request bodies
 app.use(express.json());  
 
-//Auth 
+// Auth middleware
+app.use(authMiddleware({ required: true }));
 
 app.use(requestLoggerMiddleware);
 

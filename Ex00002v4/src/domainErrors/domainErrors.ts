@@ -1,4 +1,4 @@
-//6
+//19.2
 
 /**
  * Business-level error codes.
@@ -10,9 +10,13 @@
  */
 export enum DomainErrorCode {
 
-  // ForbiddenError codes (403) - if needed in future
-  // PERMISSION_DENIED = "PERMISSION_DENIED",
+  // UnauthorizedError codes (401)
+  UN_AUTHORIZED = "UN_AUTHORIZED",
+
+  // ForbiddenError - codes (403) - if needed in future
+  FORBIDDEN = "FORBIDDEN",
   
+
   // ConflictError codes (409) - if needed in future
   // DUPLICATE_SONG = "DUPLICATE_SONG",
   
@@ -53,6 +57,32 @@ export abstract class DomainError extends Error {
   }
 }
 
+
+
+/**
+ * Thrown when authentication is required but missing (401)
+ * 
+ * @example
+ * throw new UnauthorizedError  ();
+ */
+export class UnauthorizedError extends DomainError {
+  constructor(message: string, details?: unknown) {
+    super(DomainErrorCode.UN_AUTHORIZED, message, details);
+  }
+}
+
+/**
+ * Thrown when an operation is forbidden by business rules (403)
+ * 
+ * @example
+ * throw new ForbiddenError("User does not have permission");
+ */
+export class ForbiddenError extends DomainError {
+  constructor( message: string, details?: unknown) {
+    super(DomainErrorCode.FORBIDDEN, message, details);
+  }
+}
+
 /**
  * Thrown when a requested entity is not found (404)
  * 
@@ -72,18 +102,6 @@ export class NotFoundError extends DomainError {
  * throw new BadRequestError(DomainErrorCode.ARTIST_NOT_EXIST, "Artist does not exist");
  */
 export class BadRequestError extends DomainError {
-  constructor(code: DomainErrorCode, message: string, details?: unknown) {
-    super(code, message, details);
-  }
-}
-
-/**
- * Thrown when an operation is forbidden by business rules (403)
- * 
- * @example
- * throw new ForbiddenError(DomainErrorCode.PERMISSION_DENIED, "User does not have permission");
- */
-export class ForbiddenError extends DomainError {
   constructor(code: DomainErrorCode, message: string, details?: unknown) {
     super(code, message, details);
   }

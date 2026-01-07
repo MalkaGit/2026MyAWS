@@ -53,7 +53,7 @@ const baseLogger = pino({
  */
 function buildContextFields() {
   return {
-    userId: requestContext.get('userId'),                     // populated by auth middleware
+    userId: requestContext.get('userId'),                     // populated by auth middleware, read here
     correlationId: requestContext.get('correlationId'),      //  populated by requestContext middleware
   };
 }

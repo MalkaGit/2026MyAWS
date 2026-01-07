@@ -1,8 +1,16 @@
-//9.1
+//9.1, 19.6
 // Thin controller layer: extracts validated data from req.validated, calls service, returns HTTP response
-// Critical: using TypedRequest instead of Request that requires using as and any cast
-import { TypedRequest } from "../appTypes/express";  //<body,params,query>
-import { Request, Response, NextFunction } from "express";
+//Flow
+// -auth middleware runs first, writing user id to request context and to typed request
+// -request validator runs next, validating body, params, and query
+//  and writing the typed objects on the typed (authorized) request
+// -the methods on this controller do not get express request (which requires casting as),
+//  but gets the authenticated typed request
+// - Errors handled by errorMiddleware 
+// Clean
+import { logger } from "../infra.utils/logger";
+import { AuthenticatedTypedRequest } from "../appTypes/express";  //<body,params,query> with userId instead express request
+import { Request, Response, NextFunction } from "express";        //not immpoting experss request
 import { QueryInput } from "../domainModels/common/queryInput";
 import { SongCreateInput } from "../domainModels/song/songCreateInput";
 import { SongUpdateInput } from "../domainModels/song/songUpdateInput";
@@ -15,15 +23,14 @@ import * as songService from "../domainServices/songService";
  * Note: getAllsongs and getSongById use different schema  but in the end we use the same model (QueryInput)  
 */
 export async function getAllSongs(
-  req: TypedRequest<any, any, QueryInput>, //instead untyped request 
+  req: AuthenticatedTypedRequest<any, any, QueryInput>,
   res: Response,
   next: NextFunction
 ) {
   try {
-    // Query string is optional (all fields in QueryInputSchema are optional)
-    // If user sends no query string: Zod returns undefined (not object with all fields undefined)
-    // If user sends query string: validatedQuery is a QueryInput object
-    const query :QueryInput | undefined = req.validatedQuery;
+    const userId : string  = req.userId!;    //note: req.userId is string? but adding ! ensures typescipt it is string (since we are after the authMiddlware). The ! operator tells TypeScript "trust me, this value exists" - no null check needed
+    logger.info(`getAllSongs was called for  ${userId}`);
+    const query :QueryInput | undefined = req.validatedQuery;   // If user sends no query string: Zod returns undefined    
     const songs = await songService.getAllSongs(query);
     res.status(200).json(songs);
   } catch (err) {
@@ -32,25 +39,21 @@ export async function getAllSongs(
 }
 
 
-
 /**
  * GET /songs/:id
  * Returns a single song by ID, with optional field selection and includes.
- * Note: getAllsongs and getSongById use different schema  but in the end we use the same model (QueryInput)  
- * Assumes request validation middleware has already parsed & typed req.params and req.query.
- * Errors → errorMiddleware (NotFoundError) 
+ * Notes:
+ * - getAllsongs and getSongById use different schema  but in the end we use the same model (QueryInput)  
+ 
 */
 export async function getSongById(
-  req: TypedRequest<any, { id: string }, QueryInput>,
+  req: AuthenticatedTypedRequest<any, { id: string }, QueryInput>,
   res: Response,
   next: NextFunction
 ) {
   try {
     const { id } = req.params; // No 'as' needed - req.params is already typed   (req.params as {id:string})
-    // Query string is optional (all fields in QueryByIdInputSchema are optional)
-    // If user sends no query string: Zod returns undefined (not object with all fields undefined)
-    // If user sends query string: validatedQuery is a QueryInput object
-    const query :QueryInput | undefined = req.validatedQuery;
+    const query :QueryInput | undefined = req.validatedQuery;  // If user sends no query string: Zod returns undefined    
     const song = await songService.getSongById(id, query);
     res.status(200).json(song);
   } catch (err) {
@@ -58,16 +61,15 @@ export async function getSongById(
   }
 }
 
-
-
 /**
  * POST /songs
  * Creates a new song.
- * Assumes request validation middleware has already parsed & typed req.body as SongCreateInput.
- * Errors → errorMiddleware (BadRequestError) 
+ * Notes:
+ * -Assumes request validation middleware has already parsed & typed req.body as SongCreateInput.
+ * -Errors → errorMiddleware (BadRequestError) 
 */
 export async function createSong(
-  req: TypedRequest<SongCreateInput>,
+  req: AuthenticatedTypedRequest<SongCreateInput>,
   res: Response,
   next: NextFunction
 ) {
@@ -81,9 +83,6 @@ export async function createSong(
 }
 
 
-
-
-
 /**
  * PATCH /songs/:id
  * Partially updates a song.
@@ -91,7 +90,7 @@ export async function createSong(
  * Errors → errorMiddleware (NotFoundError, BadRequestError)
 */
 export async function updateSong(
-  req: TypedRequest<SongUpdateInput, { id: string }>,
+  req: AuthenticatedTypedRequest<SongUpdateInput, { id: string }>,
   res: Response,
   next: NextFunction
 ) {
@@ -115,7 +114,7 @@ export async function updateSong(
  * Errors → errorMiddleware (NotFoundError)
 */
 export async function deleteSong(
-  req: TypedRequest<any, { id: string }>,
+  req: AuthenticatedTypedRequest<any, { id: string }>,
   res: Response,
   next: NextFunction
 ) {
