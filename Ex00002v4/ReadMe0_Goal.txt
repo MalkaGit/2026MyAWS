@@ -1,3 +1,41 @@
+TOD: REFINE the layers by ther readme in the layes 
+Goal 
+    monolith app 
+    Good:
+    - less interface 
+    - api i can reuse (replace repo without chaning deoman)
+    - seperation - idea is good but folder structure makes it hard to refactor to microsercies 
+        app - express fw 
+            appApi - not used 
+                the DTOs are not used . use doamin 
+                xModel, xSchema xMapper 
+                
+            appControllers - thin !!
+            appMiddleares  - reusable 
+            appTypes
+        domain - agnostic to fw, lib, repo , cloud etc
+            idea: should not change as we change cloud, fw , lib, repo, other infra (talking to outside world - eg, sqs )
+            dommainErrors 
+            DomainMoels 
+                note: most are used as dtos 
+                we add dto only if the domain model does not match 
+            DomainServics 
+            DomainUseCases \ DomainOrch \ domainManager \ domainCommands - no
+                optional: call services 
+            domain interfaces  - not used for simpliciry 
+                domain.interfaces.db - non , simplified 
+                domain.interfaces.repositories - no , simplified 
+                domain.interfaces.infra - no 
+                    talking to external workd etc 
+                domain.interfaces.utils - 
+                    library wrappers  
+                    all layers can use 
+                    should provide api that is not depeanden on the real worlds 
+       
+    BAD: using modules (folders) by layers makes it hard to move to microservices 
+
+    - REMOTE mySql db 
+    - Access with mysql2 (no ORM)
 
 
 

@@ -9,11 +9,11 @@
 
 import { Router } from 'express';
 import { createRequestValidator } from '../appMiddlewares/requstValidator';
-import { QueryInputSchema } from '../appRequests/shared/queryInput.schema';
-import { QueryByIdInputSchema } from '../appRequests/shared/queryByIdInput.schema';
-import { songCreateSchema } from '../appRequests/songCreate.schema';
-import { songUpdateSchema } from '../appRequests/songUpdate.schema';
-import { songParamsSchema } from '../appRequests/songParams.schema';
+import { QueryInputSchema } from '../appAPI/shared/queryInput.schema';
+import { QueryByIdInputSchema } from '../appAPI/shared/queryByIdInput.schema';
+import { songCreateSchema } from '../appAPI/songCreate.schema';
+import { songUpdateSchema } from '../appAPI/songUpdate.schema';
+import { songParamsSchema } from '../appAPI/songParams.schema';
 import * as songController from '../appControllers/songController';
 
 const songRouter = Router();
