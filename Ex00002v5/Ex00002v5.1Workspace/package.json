@@ -1,0 +1,11 @@
+{
+  "name": "ex00002v5.1",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@ex00002v5.1/lib-logger && npm run build --workspace=@ex00002v5.1/app-demo",
+    "start": "npm start --workspace=@ex00002v5.1/app-demo"
+  }
+}

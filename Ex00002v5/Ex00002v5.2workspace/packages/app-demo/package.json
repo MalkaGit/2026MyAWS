@@ -1,0 +1,17 @@
+{
+  "name": "@ex00002v5.2/app-demo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prebuild": "npm run build --workspace=@ex00002v5.2/lib-logger",
+    "build": "tsc",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@ex00002v5.2/lib-logger": "1.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
