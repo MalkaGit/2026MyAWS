@@ -14,3 +14,5 @@ export {QueryInput} from "./domain/queyInput/queryInput.model";
 export {BadRequestError, NotFoundError} from "./domain/errors/error.types";
 export {DomainErrorCode} from "./domain/errors/error.codes";
 export {QueryInputValidator, FieldDependencyMap} from "./domain/queyInput/queyInput.validator";
+export type {AuthenticatedTypedRequest} from "./app/express.types/express";
+
