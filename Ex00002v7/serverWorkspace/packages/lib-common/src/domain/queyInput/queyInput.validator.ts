@@ -49,7 +49,7 @@ export class QueryInputValidator {
       for (const field of fields) {
         if (!allowedFields.includes(field)) {
           throw new BadRequestError(
-            DomainErrorCode.INVALID_FIELDS_VALUE,
+            DomainErrorCode.QUERY_WITH_INVALID_FIELDS_VALUE,
             `Invalid field value: ${field}. Allowed fields: ${allowedFields.join(", ")}`
           );
         }
@@ -58,7 +58,7 @@ export class QueryInputValidator {
           const missing = dependencies[field].filter(req => !include.includes(req));
           if (missing.length > 0) {
             throw new BadRequestError(
-              DomainErrorCode.MISSING_INCLUDE_VALUE,
+              DomainErrorCode.QUERY_WITH_MISSING_INCLUDE_VALUE,
               `Field "${field}" requires include: ${missing.join(", ")}`
             );
           }
@@ -71,7 +71,7 @@ export class QueryInputValidator {
   
         if (!allowedSortFields.includes(sortField)) {
           throw new BadRequestError(
-            DomainErrorCode.INVALID_SORT_VALUE,
+            DomainErrorCode.QUERY_WITH_INVALID_SORT_VALUE,
             `Invalid sort value: ${sortField}. Allowed sort fields: ${allowedSortFields.join(", ")}`
           );
         }
@@ -80,7 +80,7 @@ export class QueryInputValidator {
           const missing = dependencies[sortField].filter(req => !include.includes(req));
           if (missing.length > 0) {
             throw new BadRequestError(
-              DomainErrorCode.MISSING_INCLUDE_VALUE,
+              DomainErrorCode.QUERY_WITH_MISSING_INCLUDE_VALUE,
               `Sorting by "${sortField}" requires include: ${missing.join(", ")}`
             );
           }
@@ -92,7 +92,7 @@ export class QueryInputValidator {
         const invalidIncludes = include.filter(i => !allowedIncludes.includes(i));
         if (invalidIncludes.length > 0) {
           throw new BadRequestError(
-            DomainErrorCode.INVALID_INCLUDE_VALUE,
+            DomainErrorCode.QUERY_WITH_INVALID_INCLUDE_VALUE,
             `Invalid include values: ${invalidIncludes.join(", ")}. Allowed includes: ${allowedIncludes.join(", ")}`
           );
         }
