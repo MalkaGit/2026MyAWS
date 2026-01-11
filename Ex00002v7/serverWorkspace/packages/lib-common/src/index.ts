@@ -10,9 +10,11 @@
 //line below allows: import { Logger1 } from "@server/lib-common";
 export { Logger1 } from "./logger1";
 export {pool} from "./infra/db/mySqlDB.mysql2/db";
-export {QueryInput} from "./domain/queyInput/queryInput.model";
+export {QueryInput} from "./domain/queryInput/queryInput.model";
+export {QueryInputSchema} from "./domain/queryInput/queryInput.schema";
+export {QueryInputValidator, FieldDependencyMap} from "./domain/queryInput/queyInput.validator";
+export {QueryByIdInputSchema} from "./domain/queryByIdInput/queryByIdInput.schema";
 export {BadRequestError, NotFoundError} from "./domain/errors/error.types";
 export {DomainErrorCode} from "./domain/errors/error.codes";
-export {QueryInputValidator, FieldDependencyMap} from "./domain/queyInput/queyInput.validator";
 export type {AuthenticatedTypedRequest} from "./app/express.types/express";
-
+export {createRequestValidator} from "./app/express.middlewares/requestValidator";
