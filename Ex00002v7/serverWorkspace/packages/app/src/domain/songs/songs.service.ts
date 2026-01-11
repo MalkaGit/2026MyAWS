@@ -13,9 +13,9 @@ import { QueryInputValidator, FieldDependencyMap } from "@server/lib-common";
 import { BadRequestError, NotFoundError, DomainErrorCode } from "@server/lib-common";
 import * as songRepo from "./songs.repository";
 import { QueryInput } from "@server/lib-common"; //note: you us build lib-common
-import { SongCreateInput } from "./models/songCreateInput";
+import { SongCreateInput } from "./models/song.createInput";
 import { Song } from "./models/song";
-import { SongUpdateInput } from "./models/songUpdateInput";
+import { SongUpdateInput } from "./models/song.updateInput";
 
 // --- Allowed constants ---
 

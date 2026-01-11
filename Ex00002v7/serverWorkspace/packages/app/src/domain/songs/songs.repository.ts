@@ -19,9 +19,9 @@ import { randomUUID } from "crypto";
 //import {logger} from "../../infra.utils/logger";
 import { pool } from "@server/lib-common";
 import { QueryInput } from "@server/lib-common"; //note: you us build lib-common
-import { SongCreateInput } from "./models/songCreateInput";
+import { SongCreateInput } from "./models/song.createInput";
 import { Song } from "./models/song";
-import { SongUpdateInput } from "./models/songUpdateInput";
+import { SongUpdateInput } from "./models/song.updateInput";
 
 //import { SongQuery } from "../../domainModels/song/songQuery";
 //import { SongsQuery } from "../../domainModels/song/songsQuery";
