@@ -9,3 +9,5 @@
 
 //line below allows: import { Logger1 } from "@server/lib-common";
 export { Logger1 } from "./logger1";
+export {pool} from "./infra/db/mySqlDB.mysql2/db";
+export {QueryInput} from "./domain/models/queryInput";

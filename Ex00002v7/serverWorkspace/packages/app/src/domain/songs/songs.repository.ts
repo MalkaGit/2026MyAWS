@@ -16,12 +16,13 @@
 
 import { ResultSetHeader } from "mysql2/promise";
 import { randomUUID } from "crypto";
-import {logger} from "../../infra.utils/logger";
-import { pool } from "./db";
-import { SongCreateInput } from "../../domainModels/song/songCreateInput";
-import { Song } from "../../domainModels/song/song";
-import { SongUpdateInput } from "../../domainModels/song/songUpdateInput";
-import { QueryInput } from "../../domainModels/common/queryInput";
+//import {logger} from "../../infra.utils/logger";
+import { pool } from "@server/lib-common";
+import { QueryInput } from "@server/lib-common"; //note: you us build lib-common
+import { SongCreateInput } from "./models/songCreateInput";
+import { Song } from "./models/song";
+import { SongUpdateInput } from "./models/songUpdateInput";
+
 //import { SongQuery } from "../../domainModels/song/songQuery";
 //import { SongsQuery } from "../../domainModels/song/songsQuery";
 
@@ -165,7 +166,7 @@ export async function getAllSongs(query?: QueryInput): Promise<Song[]> {
     }
 
   // Execute query with the parameters
-  logger.debug("getAllSongs - SQL query", { sql, params });
+  //logger.debug("getAllSongs - SQL query", { sql, params });
   const [rows] = await pool.query(sql, params);
   
   // Map each row to the Song domain model
@@ -206,7 +207,7 @@ export async function getSongById(id: string, query?: QueryInput): Promise<Song 
   sql += " WHERE s.id = ?";
   params.push(id);
 
-  logger.debug("getSongById - SQL query", { sql, params });
+  //logger.debug("getSongById - SQL query", { sql, params });
   const [rows] = await pool.query(sql, params);
   const result = rows as any[];
   return result.length ? mapRow(result[0], includeArtist) : null;
@@ -233,7 +234,7 @@ export async function createSong(input: SongCreateInput): Promise<string> {
   const id = randomUUID();
   const sql = `INSERT INTO songs (id, title, artist_id, url) VALUES (?, ?, ?, ?)`;
   const params = [id, input.title, input.artistId, input.url ?? null];
-  logger.debug("createSong - SQL query", { sql, params });
+  //logger.debug("createSong - SQL query", { sql, params });
   await pool.query(sql, params);
   return id;
 }
@@ -293,7 +294,7 @@ export async function updateSong(id: string, input: SongUpdateInput): Promise<bo
   const sql = `UPDATE songs
      SET ${setClauses.join(', ')}
      WHERE id = ?`;
-  logger.debug("updateSong - SQL query", { sql, params });
+  //logger.debug("updateSong - SQL query", { sql, params });
   const [result] = await pool.query<ResultSetHeader>(sql, params);
 
   return result.affectedRows > 0;
@@ -316,7 +317,7 @@ export async function updateSong(id: string, input: SongUpdateInput): Promise<bo
 export async function deleteSong(id: string): Promise<boolean> {
   const sql = `DELETE FROM songs WHERE id = ?`;
   const params = [id];
-  logger.debug("deleteSong - SQL query", { sql, params });
+  //logger.debug("deleteSong - SQL query", { sql, params });
   const [result] = await pool.query<ResultSetHeader>(sql, params);
   return result.affectedRows > 0;
 }
