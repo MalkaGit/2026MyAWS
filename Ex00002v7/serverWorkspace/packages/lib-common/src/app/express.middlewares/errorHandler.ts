@@ -38,7 +38,7 @@
 
 import { Request, Response, NextFunction } from "express";
 import { ZodError, ZodIssue } from "zod";
-//import { logger } from "../infra.utils/logger";
+import { logger } from "../../utils/logger/logger";
 //import { requestContext } from "../infra.utils/request-context";
 import {
   DomainError,
@@ -157,7 +157,7 @@ export function errorMiddleware(
   if (err instanceof ZodError) {
     const validationErrors = mapZodErrorToDtoError(err);
     
-    console.warn("Request validation failed", {
+    logger.warn("Request validation failed", {
       ...baseLogContext,
       errors: validationErrors,
     });
@@ -172,7 +172,7 @@ export function errorMiddleware(
   if (err instanceof DomainError) {
     const statusCode = getDomainErrorStatusCode(err);
     
-    console.warn("Domain error", {
+    logger.warn("Domain error", {
       ...baseLogContext,
       code: err.code,
       message: err.message,
@@ -188,7 +188,7 @@ export function errorMiddleware(
   const errorMessage = err instanceof Error ? err.message : String(err);
   const errorStack = err instanceof Error ? err.stack : undefined;
 
-  console.error("Unexpected error", {
+  logger.error("Unexpected error", {
     ...baseLogContext,
     error: errorMessage,
     stack: errorStack,

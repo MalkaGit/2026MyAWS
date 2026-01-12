@@ -1,4 +1,3 @@
-//TODO: replace console log with logger
 //9.6, 15.1
 /**
  * Express server startup
@@ -24,13 +23,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import app from "./app";
-//import { logger } from "./infra.utils/logger";
+import { logger } from "@server/lib-common";
 
 // 15.1 log process-level crashes  (not related to http requests)
 // Handle uncaught exceptions (synchronous errors)
 process.on("uncaughtException", (error: Error) => {
-  //todo: it ws logge.fatal
-  console.log("Uncaught Exception - Application will exit", {
+  logger.fatal("Uncaught Exception - Application will exit", {
     error: error.message,
     stack: error.stack,
     name: error.name,
@@ -44,8 +42,7 @@ process.on("uncaughtException", (error: Error) => {
 process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) => {
   const errorMessage = reason instanceof Error ? reason.message : String(reason);
   const errorStack = reason instanceof Error ? reason.stack : undefined;
-  //todo: it ws logger.fatal
-  console.log("Unhandled Rejection - Application will exit", {
+  logger.fatal("Unhandled Rejection - Application will exit", {
     error: errorMessage,
     stack: errorStack,
     promise: promise.toString(),
@@ -58,7 +55,7 @@ process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) =>
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });
 
 
