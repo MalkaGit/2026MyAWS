@@ -3,7 +3,7 @@
 // c:\Repos\LearningAWS2026\Ex00002v7\serverWorkspace\packages\lib-common> npx ts-node src/infra/db/mySqlDB.mysql2/dbTestConnection.ts
 
 
-import { pool } from "./db";
+import { pool } from "./db.client";
 
 async function testConnection() { 
     try { 
