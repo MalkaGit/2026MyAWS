@@ -1,0 +1,11 @@
+{
+  "name": "server",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@server/lib-common && npm run build --workspace=@server/app",
+    "start": "npm start --workspace=@server/app"
+  }
+}
