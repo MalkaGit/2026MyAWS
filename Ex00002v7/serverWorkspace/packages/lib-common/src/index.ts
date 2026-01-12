@@ -18,3 +18,4 @@ export {BadRequestError, NotFoundError} from "./domain/errors/error.types";
 export {DomainErrorCode} from "./domain/errors/error.codes";
 export type {AuthenticatedTypedRequest} from "./app/express.types/express";
 export {createRequestValidator} from "./app/express.middlewares/requestValidator";
+export {errorMiddleware} from "./app/express.middlewares/errorHandler";
