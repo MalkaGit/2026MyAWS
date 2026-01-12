@@ -19,3 +19,5 @@ export {DomainErrorCode} from "./domain/errors/error.codes";
 export type {AuthenticatedTypedRequest} from "./app/express.types/express";
 export {createRequestValidator} from "./app/express.middlewares/requestValidator";
 export {errorMiddleware} from "./app/express.middlewares/errorHandler";
+export {requestContextMiddleware} from "./app/express.middlewares/requestContext";
+export {logger} from "./utils/logger/logger";

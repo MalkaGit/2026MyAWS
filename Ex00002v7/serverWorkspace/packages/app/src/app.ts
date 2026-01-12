@@ -28,7 +28,7 @@ Typical request lifecycle:
 import express from "express";
 //import cors from "cors";
 //import morgan from "morgan";
-//import {requestContextMiddleware} from "./appMiddlewares/requestContext";
+import {requestContextMiddleware} from "@server/lib-common";
 //import {authMiddleware} from "./appMiddlewares/authMiddleware";
 //import {requestLoggerMiddleware} from "./appMiddlewares/requestLogger";
 import { errorMiddleware } from "@server/lib-common";
@@ -40,7 +40,7 @@ const app = express();
 
 
 // creating request context (and correlation id) - MUST be one of the FIRST middlewares
-//app.use (requestContextMiddleware);
+app.use (requestContextMiddleware);
 
 // Parse JSON request bodies
 app.use(express.json());  
