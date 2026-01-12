@@ -29,7 +29,7 @@ export async function getAllSongs(
 ) {
   try {
     const userId : string  = req.userId!;    //note: req.userId is string? but adding ! ensures typescipt it is string (since we are after the authMiddlware). The ! operator tells TypeScript "trust me, this value exists" - no null check needed
-    //logger.info(`getAllSongs was called for  ${userId}`);
+    logger.info(`getAllSongs was called for  ${userId}`);
     const query :QueryInput | undefined = req.validatedQuery;   // If user sends no query string: Zod returns undefined    
     const songs = await songService.getAllSongs(query);
     res.status(200).json(songs);

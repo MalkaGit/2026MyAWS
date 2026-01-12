@@ -21,3 +21,5 @@ export {createRequestValidator} from "./app/express.middlewares/requestValidator
 export {errorMiddleware} from "./app/express.middlewares/errorHandler";
 export {requestContextMiddleware} from "./app/express.middlewares/requestContext";
 export {logger} from "./utils/logger/logger";
+export {requestLoggerMiddleware} from "./app/express.middlewares/requestLogger";
+export {authMiddleware} from "./app/express.middlewares/authMiddleware";

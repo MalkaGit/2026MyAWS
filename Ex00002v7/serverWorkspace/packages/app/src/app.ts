@@ -29,8 +29,8 @@ import express from "express";
 //import cors from "cors";
 //import morgan from "morgan";
 import {requestContextMiddleware} from "@server/lib-common";
-//import {authMiddleware} from "./appMiddlewares/authMiddleware";
-//import {requestLoggerMiddleware} from "./appMiddlewares/requestLogger";
+import {authMiddleware} from "@server/lib-common";
+import {requestLoggerMiddleware} from "@server/lib-common";
 import { errorMiddleware } from "@server/lib-common";
 import songRouter from "./domain/songs/songs.router";
 
@@ -46,9 +46,9 @@ app.use (requestContextMiddleware);
 app.use(express.json());  
 
 // Auth middleware
-//app.use(authMiddleware({ required: true }));
+app.use(authMiddleware({ required: true }));
 
-//app.use(requestLoggerMiddleware);
+app.use(requestLoggerMiddleware);
 
 // API Routes
 app.use("/api/songs", songRouter);
