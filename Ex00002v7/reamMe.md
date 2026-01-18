@@ -1,6 +1,6 @@
 
 ===========================
-TO run:
+TO run: :-)
 ============================
 make sure .env is ok
 c:\Repos\LearningAWS2026\Ex00002v7\serverWorkspace\packages\app>
