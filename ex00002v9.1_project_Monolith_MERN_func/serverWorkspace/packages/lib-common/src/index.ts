@@ -21,3 +21,14 @@ export { mysqlPool} from "./infra/db/mySqlDB.mysql2";
 
 // Line below allows: import { testMySqlConnection } from "@server/lib-common";
 export {testMySqlConnection} from "./infra/db/mySqlDB.mysql2";
+
+// Line below allows: import { DomainErrorCode, BadRequestError, NotFoundError, etc. } from "@server/lib-common";
+export { 
+  DomainErrorCode,
+  DomainError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError
+} from "./domain/errors";
