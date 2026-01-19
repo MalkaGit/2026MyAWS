@@ -11,5 +11,7 @@
 //l1.log("Hello");
 
 import { logger } from "@server/lib-common";
-logger.info("Hello");
+logger.info("Hello info");
+logger.debug("Hello debug");
+
 
