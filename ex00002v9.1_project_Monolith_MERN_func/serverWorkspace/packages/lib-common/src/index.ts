@@ -32,3 +32,11 @@ export {
   NotFoundError,
   ConflictError
 } from "./domain/errors";
+
+// Line below allows: import { TypedRequest, TypedAuthorizedRequest, RequestContext, etc. } from "@server/lib-common";
+export type {
+  TypedRequest,
+  AuthorizedTypedRequest,
+  RequestContext,
+  AuthorizedRequestContext
+} from "./app/express.types";
