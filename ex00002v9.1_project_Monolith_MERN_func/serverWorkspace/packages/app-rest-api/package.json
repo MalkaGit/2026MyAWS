@@ -6,5 +6,10 @@
     "prebuild": "npm run build --workspace=@server/lib-common",
     "build": "tsc",
     "start": "node dist/server.js"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
   }
 }
