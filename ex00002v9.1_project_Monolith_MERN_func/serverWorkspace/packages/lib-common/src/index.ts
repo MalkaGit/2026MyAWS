@@ -1,6 +1,6 @@
 /**
- * PACKAGE PUBLIC API
- * ==================
+ * PAACKAGE MODULE: PACKAGE PUBLIC API
+ * ====================================
  * This is the package entry point.
  * It defines modules that can be imported by package name.
  * So if we change the file name or the folder name,
@@ -9,4 +9,7 @@
 
 // Line below allows: import { Logger1 } from "@server/lib-common";
 export { Logger1 } from "./utils/logger1";
+
+// Line below allows: import { withRequestContext, requestContext } from "@server/lib-common";
+export { withRequestContext, requestContext } from "./utils/request-context";
 
