@@ -1,5 +1,5 @@
 {
-  "name": "@server/app",
+  "name": "@server/app-rest-api",
   "version": "1.0.0",
   "private": true,
   "scripts": {
