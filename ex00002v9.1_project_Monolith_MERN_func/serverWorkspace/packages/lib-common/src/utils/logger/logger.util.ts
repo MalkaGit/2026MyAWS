@@ -2,6 +2,9 @@
 // Goal: Central application logger.
 //  configuration:
 //      read log level from env.LOG_LEVEL (default: info)
+//      read environment from env.NODE_ENV (default: development)
+//           if development, use pretty logs. 
+//           othewise, pino json logs (better for log aggregation tools)
 // dependenies:
 //      request-context module
 // install packages:
@@ -15,7 +18,7 @@
 //       Enriches logs with data from request context 
 //            eg, add to each log corrlation id that the request context middleware wrote to request contet (new id o from request header)
 //            eg, add to each log the user id that the auth middleware wrote to the request context      
-//  read log level from env.LOG_LEVEL (default: info)
+//       writes the log in pretty format for development and in json format for production
 
 // Clean
 //   Framework-agnostic (no Express / Fastify / Next.js)
@@ -23,8 +26,11 @@
 //   decoupling consumers from the logging library (pino)
 //        wrapping logger
 // Usage (ANYWHERE in app or domain):
-//   import { logger } from '../utils/logger';
+//   import { logger } from "@server/lib-common";
 //   logger.info('Something happened');
+
+
+
 
 // Load environment variables if not already loaded (defensive: ensures .env is available)
 // Note: dotenv.config() is idempotent - safe to call multiple times
