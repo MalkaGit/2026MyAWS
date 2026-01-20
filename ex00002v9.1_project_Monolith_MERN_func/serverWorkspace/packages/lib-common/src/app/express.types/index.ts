@@ -9,5 +9,5 @@
  *          instead of: import { TypedRequest } from "./app/express.types/express.d";
  */
 
-export type { TypedRequest } from "./express.d";
+export type { TypedRequest } from "./express";
 
