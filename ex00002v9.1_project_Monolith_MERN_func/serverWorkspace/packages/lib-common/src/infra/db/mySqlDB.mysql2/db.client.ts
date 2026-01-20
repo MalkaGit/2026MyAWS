@@ -1,6 +1,6 @@
 /**
  * Phase 10.3
- * File module exporting MySQL database client utilities
+ * File module exporting functions
  * 
  * Goal:
  *    Create connection pool to MySQL database using mysql2 library
@@ -9,7 +9,7 @@
  * Architecture:
  *    - Uses mysql2/promise for async/await support
  *    - Connection pool manages multiple database connections efficiently
- *    - API is tied to mysql2 library and mysql2 library is tied to MySQL database
+ *    - API is tied to mysql2 library and to MySQL database
  *    - Configuration is read from environment variables (.env file)
  * 
  * Flow:
