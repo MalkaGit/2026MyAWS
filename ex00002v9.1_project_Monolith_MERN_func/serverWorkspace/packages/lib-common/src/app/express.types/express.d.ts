@@ -1,109 +1,76 @@
-//5
-// Goals:
-//    Declare TypedRequest with RequestContext (contains correlationId)
-//    Declare TypedAuthorizedRequest with AuthorizedRequestContext (contains userId and userRole)
-// Usage:
-// -1. zod will parse the query string parameters and validate them
-// -2. controller will get typed request instead express untyped request
-//          with correlation id 
-//          with parsed query string parameters according to given type
-// -3. corrleation id managment
-//     request-context middleware writes the correlationId on the request 
-//     controller may read it from the requst
-// -4. userId and userRole managment
-//     auth middleware writes userId and userRole on the request
-//     controller may read it from the requst and pass it to the service layer 
-// dependencies: express
-//      cd in serverWorkspace/packages/lib-common and run:
-//      npm install --save-dev @types/express
-// ============================================================================
+/**
+ * Phase 10.5
+ * File module exporting types
+ * 
+ * Goal:
+ *    Declare TypedRequest<TBody, TParams, TQuery>
+ *    TBody is the type of the body property - Optional
+ *    TParams is the type of the params property - Optional 
+ *    TQuery is the type of the query string parameters  - Optional
+ * 
+ * Usage:
+ *    Controller can accees req.validatedQuery to get typed object with parsed query string parameters
+ *    Controller can access req.body to get typed object 
+ *    Controller can access req.params to get typed parameters 
+ * 
+ * Flow:
+ *    1. Request-validation middleware uses Zod to parse request and write parsed dta on the request 
+ *    2. Controller can then safely work on typed request
+ * 
+ * Dependencies:
+ *    cd in serverWorkspace/packages/lib-common
+ *    npm install express
+ *    npm install --save-dev @types/express
+ * 
+ * Note: Request context (correlationId, userId, userRole) 
+ *       is not stored on request object, 
+ *       but in framework-agnostic requestContext utility (AsyncLocalStorage), not on req.context or req.user. 
+ *       Access request context via requestContext.getCorrelationId(), requestContext.getUserId(), etc.
+ */
 
 import { Request as ExpressRequest } from 'express';
 
-// ============================================================================
-// RequestContext: Base request context (for unauthenticated routes)
-// ============================================================================
-export interface RequestContext {
-  correlationId: string;
-}
-
-// ============================================================================
-// AuthorizedRequestContext: Extended context for authenticated routes
-// ============================================================================
-export interface AuthorizedRequestContext extends RequestContext {
-  userId: string;
-  userRole: string;
-}
-
-// ============================================================================
-// MODULE AUGMENTATION: Add custom properties to Express Request
-// ============================================================================
-// TypeScript allows extending third-party types using "declare global"
-// This adds validatedQuery and context to ALL Express Request objects
-// ============================================================================
+/**
+ * MODULE AUGMENTATION: Extend Express Request interface
+ * Adds validatedQuery property to all Express Request objects
+ * Type is 'any' here because generics aren't allowed in global declarations
+ * Actual typing is provided by TypedRequest<TBody, TParams, TQuery>
+ */
 declare global {
   namespace Express {
     interface Request {
-      // Typed query parameters (set by validation middleware)
+      // Validated query string parameters (set by request-validator middleware)
       // Optional because not all routes validate query strings
-      // Type is 'any' here (can't use generics in global declarations)
       validatedQuery?: any;
-      
-      // Request context from middleware (request-context, auth, etc.)
-      // Can be RequestContext (unauthenticated) or AuthorizedRequestContext (authenticated)
-      // Optional because middleware may not always set it
-      context?: RequestContext | AuthorizedRequestContext;
     }
   }
 }
 
-// ============================================================================
-// TypedRequest: Strongly-typed request for unauthenticated routes
-// ============================================================================
-// Provides type safety for body, params, and query parameters
-// Used for routes that don't require authentication (e.g., register, login)
-// 
-// Usage:
-//   TypedRequest<SongCreateInput, {id: string}, QueryInput>
-//   - body: SongCreateInput (not 'any')
-//   - params: {id: string} (not 'any')
-//   - validatedQuery: QueryInput (not 'any')
-//   - context: RequestContext (has correlationId only)
-// ============================================================================
+/**
+ * TypedRequest: Strongly-typed request for Express handlers
+ * Provides type safety for body, params, and validatedQuery
+ * 
+ * @template TBody - Type for req.body (default: any)
+ * @template TParams - Type for req.params (default: any)
+ * @template TQuery - Type for req.validatedQuery (default: any)
+ * 
+ * @example
+ *   For update song endpoint, controller can access typed body and params
+ *   TypedRequest<SongUpdateInput, {id: string}, any>
+ *   - body: SongUpdateInput    - the body of the request (the song to update)
+ *   - params: {id: string}     - the id of the song to update
+ * 
+ * @example
+ *   For reading songs, controller can access typed validated query string
+ *   TypedRequest<any, any, QueryInput>
+ *   it can then access req.validatedQuery of type ReadQueryInput
+ *   to get parsed query sttring data: sotry (comma seperated string splint into string array),  offset: number, limit: number
+ */
 export type TypedRequest<TBody = any, TParams = any, TQuery = any> = 
 ExpressRequest & {
   body: TBody;
   params: TParams;
   validatedQuery?: TQuery;
-  
-  // Context is optional for Express router compatibility
-  // Runtime guarantee: Request-context middleware sets correlationId
-  context?: RequestContext;
-};
-
-// ============================================================================
-// TypedAuthorizedRequest: Strongly-typed request for authenticated routes
-// ============================================================================
-// Provides type safety for body, params, and query parameters
-// Used for routes that require authentication (e.g., create song, update profile)
-// 
-// Usage:
-//   TypedAuthorizedRequest<SongCreateInput, {id: string}, QueryInput>
-//   - body: SongCreateInput (not 'any')
-//   - params: {id: string} (not 'any')
-//   - validatedQuery: QueryInput (not 'any')
-//   - context: AuthorizedRequestContext (has correlationId, userId, userRole)
-// ============================================================================
-export type AuthorizedTypedRequest<TBody = any, TParams = any, TQuery = any> = 
-ExpressRequest & {
-  body: TBody;
-  params: TParams;
-  validatedQuery?: TQuery;
-  
-  // Context is optional for Express router compatibility
-  // Runtime guarantee: Auth middleware sets userId and userRole, request-context middleware sets correlationId
-  // Use req.context! in controllers to assert it's definitely set
-  context?: AuthorizedRequestContext;
 };
 
 // Export {} makes this file a module (required for declare global to work)

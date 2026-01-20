@@ -33,12 +33,9 @@ export {
   ConflictError
 } from "./domain/errors";
 
-// Line below allows: import { TypedRequest, TypedAuthorizedRequest, RequestContext, etc. } from "@server/lib-common";
+// Line below allows: import { TypedRequest } from "@server/lib-common";
 export type {
-  TypedRequest,
-  AuthorizedTypedRequest,
-  RequestContext,
-  AuthorizedRequestContext
+  TypedRequest
 } from "./app/express.types";
 
 // Line below allows: import { createRequestValidator } from "@server/lib-common";
