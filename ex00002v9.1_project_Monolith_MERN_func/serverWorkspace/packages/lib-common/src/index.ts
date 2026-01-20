@@ -43,3 +43,6 @@ export type {
 
 // Line below allows: import { createRequestValidator } from "@server/lib-common";
 export { createRequestValidator } from "./app/express.middlewares";
+
+// Line below allows: import { requestContextMiddleware } from "@server/lib-common";
+export { requestContextMiddleware } from "./app/express.middlewares";
