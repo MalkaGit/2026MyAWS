@@ -1,15 +1,35 @@
-//4
 /**
- * These types are used to create domain errors.
- *
- * - domain errors have 
- *   an error code that is independent of http
- *   and is readable by machines.
- * - domain errors also have a message.
- * - domain errors are thrown by domain
- *   and handled by error handler middleware (API layer)
- *   that returns http respose 
- *   with http status code and the domain error code.
+ * Phase 10.4
+ * File module exporting domain error types
+ * 
+ * Goal:
+ *    Define domain-specific error classes with error codes and messages
+ *    Domain errors are thrown by domain layer and handled by API layer (error handler middleware)
+ *    Error codes are machine-readable and independent of HTTP status codes
+ * 
+ * Architecture:
+ *    - Domain errors have error code (DomainErrorCode) that is independent of HTTP
+ *    - Domain errors have human-readable message
+ *    - Error codes are machine-readable for programmatic error handling
+ *    - Framework-agnostic: errors are domain concepts, not tied to Express/HTTP
+ * 
+ * Flow:
+ *    1. Domain layer throws domain errors (BadRequestError, NotFoundError, etc.)
+ *    2. Error handler middleware (API layer) catches domain errors
+ *    3. Middleware maps domain error to HTTP response with HTTP status code and domain error code
+ *    4. Frontend receives HTTP status code and domain error code for error handling
+ * 
+ * Usage:
+ *    - In domain layer: throw new BadRequestError(DomainErrorCode.ARTIST_NOT_EXIST, "Artist does not exist")
+ *    - In domain layer: throw new NotFoundError(DomainErrorCode.SONG_NOT_FOUND, "Song with id 123 not found")
+ *    - Error handler middleware automatically converts to HTTP response
+ * 
+ * Error Types:
+ *    - BadRequestError (400): Invalid request according to business rules
+ *    - UnauthorizedError (401): Authentication required but missing
+ *    - ForbiddenError (403): Operation forbidden by business rules
+ *    - NotFoundError (404): Requested entity not found
+ *    - ConflictError (409): Conflict occurs (e.g., duplicate entry)
  */
 
 import { DomainErrorCode } from "./error.codes";
