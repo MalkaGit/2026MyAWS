@@ -1,31 +1,41 @@
 /**
  * Phase 10.5
- * File module exporting types
+ * File module exporting Express type definitions
  * 
  * Goal:
- *    Declare TypedRequest<TBody, TParams, TQuery>
- *    TBody is the type of the body property - Optional
- *    TParams is the type of the params property - Optional 
- *    TQuery is the type of the query string parameters  - Optional
+ *    Declare TypedRequest<TBody, TParams, TQuery> for type-safe Express request handling
+ *    Provides type safety for req.body, req.params, and req.validatedQuery
+ *    TBody, TParams, TQuery are optional generic type parameters
  * 
- * Usage:
- *    Controller can accees req.validatedQuery to get typed object with parsed query string parameters
- *    Controller can access req.body to get typed object 
- *    Controller can access req.params to get typed parameters 
+ * Architecture:
+ *    - Extends Express Request interface with validatedQuery property
+ *    - TypedRequest provides generic type parameters for body, params, and validatedQuery
+ *    - Request-validation middleware uses Zod to parse and validate request data
+ *    - Framework-dependent: Express-specific types
+ *    - Request context (correlationId, userId, userRole) is NOT stored on request object
+ *      but in framework-agnostic requestContext utility (AsyncLocalStorage)
  * 
  * Flow:
- *    1. Request-validation middleware uses Zod to parse request and write parsed dta on the request 
- *    2. Controller can then safely work on typed request
+ *    1. Request-validation middleware uses Zod to parse and validate request data
+ *    2. Validated data is written to req.validatedQuery (for query string parameters)
+ *    3. Controller uses TypedRequest<TBody, TParams, TQuery> to get typed access
+ *    4. Controller can safely access req.body, req.params, req.validatedQuery with full type safety
+ * 
+ * Usage:
+ *    - Import: import { TypedRequest } from "@server/lib-common"
+ *    - In controller: (req: TypedRequest<SongUpdateInput, {id: string}, any>) => { ... }
+ *    - Access typed body: req.body (type: SongUpdateInput)
+ *    - Access typed params: req.params (type: {id: string})
+ *    - Access typed validatedQuery: req.validatedQuery (type: TQuery)
  * 
  * Dependencies:
  *    cd in serverWorkspace/packages/lib-common
  *    npm install express
  *    npm install --save-dev @types/express
  * 
- * Note: Request context (correlationId, userId, userRole) 
- *       is not stored on request object, 
- *       but in framework-agnostic requestContext utility (AsyncLocalStorage), not on req.context or req.user. 
- *       Access request context via requestContext.getCorrelationId(), requestContext.getUserId(), etc.
+ * Important:
+ *    - Request context (correlationId, userId, userRole) is accessed via requestContext utility, not req.context
+ *    - Use requestContext.getCorrelationId(), requestContext.getUserId(), etc. to access context
  */
 
 import { Request as ExpressRequest } from 'express';
@@ -33,8 +43,8 @@ import { Request as ExpressRequest } from 'express';
 /**
  * MODULE AUGMENTATION: Extend Express Request interface
  * Adds validatedQuery property to all Express Request objects
- * Type is 'any' here because generics aren't allowed in global declarations
- * Actual typing is provided by TypedRequest<TBody, TParams, TQuery>
+ * Type is 'any' here because generics aren't allowed in global type declarations
+ * Actual typing is provided by TypedRequest<TBody, TParams, TQuery> generic type
  */
 declare global {
   namespace Express {
@@ -55,16 +65,16 @@ declare global {
  * @template TQuery - Type for req.validatedQuery (default: any)
  * 
  * @example
- *   For update song endpoint, controller can access typed body and params
+ *   // Update song endpoint - typed body and params
  *   TypedRequest<SongUpdateInput, {id: string}, any>
- *   - body: SongUpdateInput    - the body of the request (the song to update)
- *   - params: {id: string}     - the id of the song to update
+ *   - body: SongUpdateInput (the song data to update)
+ *   - params: {id: string} (the song ID)
  * 
  * @example
- *   For reading songs, controller can access typed validated query string
+ *   // Read songs endpoint - typed validated query string
  *   TypedRequest<any, any, QueryInput>
- *   it can then access req.validatedQuery of type ReadQueryInput
- *   to get parsed query sttring data: sotry (comma seperated string splint into string array),  offset: number, limit: number
+ *   - validatedQuery: QueryInput (parsed query string)
+ *     Contains: sort (comma-separated string split into string array), offset: number, limit: number
  */
 export type TypedRequest<TBody = any, TParams = any, TQuery = any> = 
 ExpressRequest & {
