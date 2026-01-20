@@ -63,18 +63,21 @@ export function createRequestValidator(schemas: {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       if (schemas.body) {
-        // Parse and validate request body, overwrite req.body with typed data
+        //parse the request body using schemas.body
+        //and store the parsed typed data in  req.body (of type any) 
         req.body = schemas.body.parse(req.body);
       }
 
       if (schemas.params) {
-        // Parse and validate path parameters, overwrite req.params with typed data
+        //parse the request params using schemas.params
+        //and store the parsed typed data in req.params (of type ParamsDictionary)
         req.params = schemas.params.parse(req.params) as Request['params'];
       }
 
       if (schemas.query) {
-        // Parse and validate query string, store in req.validatedQuery
-        // (req.query is immutable in Express, so we use req.validatedQuery)
+        //parse the request query using schemas.query
+        //and store the parsed typed data in req.validatedQuery (of type any)         
+        //since Express does not allow overriding req.query 
         const parsedQuery = schemas.query.parse(req.query);
         req.validatedQuery = parsedQuery;
       }
