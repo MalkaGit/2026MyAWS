@@ -11,4 +11,5 @@
 export { createRequestValidator } from "./request-validator.middleware";
 export { requestContextMiddleware } from "./request-context.middleware";
 export { authMiddleware } from "./auth.middleware";
+export { requestLoggerMiddleware } from "./request-logger.middleware";
 
