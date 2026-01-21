@@ -116,7 +116,7 @@ function mapZodErrorCodeToDtoErrorCode(issue: ZodIssue): string {
     case 'too_big':
       return 'too_big';
 
-    case 'invalid_string':
+    case 'invalid_format':
       // Extract validation type (uuid, url, email, etc.) or default to invalid_string
       const validationType = 'validation' in issue ? (issue as any).validation : undefined;
       return validationType ?? 'invalid_string';
