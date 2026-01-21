@@ -29,4 +29,9 @@ test\template002__node_app_with_logger\serverWorkspace\app-rest-api>npm run buil
 run app-rest-api
 test\template002__node_app_with_logger\serverWorkspace\app-rest-api>npm start
 
+=============================================
+lib-common
+=============================================
 
+10.1 
+    lib-common> npm install, npm run build

@@ -7,6 +7,11 @@
  * the import statement will still work.
  */
 
-// Line below allows: import { Logger1 } from "lib-common"  (that is te package name in package.json)
+// Line below allows: import { Logger1 } from "@mycompanyname/lib-common"  (that is te package name in package.json)
 export { Logger1 } from "./utils/logger1";
+
+
+// Line below allows: import { withRequestContext, requestContext } from "@mycompanyname/lib-common";
+export { withRequestContext, requestContext } from "./utils/request-context";
+
 
