@@ -50,3 +50,6 @@ export { authMiddleware } from "./app/express.middlewares";
 
 // Line below allows: import { requestLoggerMiddleware } from "@server/lib-common";
 export { requestLoggerMiddleware } from "./app/express.middlewares";
+
+// Line below allows: import { errorMiddleware } from "@server/lib-common";
+export { errorMiddleware } from "./app/express.middlewares";
