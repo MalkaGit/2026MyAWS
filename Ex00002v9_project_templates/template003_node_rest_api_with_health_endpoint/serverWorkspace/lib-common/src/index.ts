@@ -14,4 +14,5 @@ export { Logger1 } from "./utils/logger1";
 // Line below allows: import { withRequestContext, requestContext } from "@mycompanyname/lib-common";
 export { withRequestContext, requestContext } from "./utils/request-context";
 
-
+// Line below allows: import { logger } from "@mycompanyname/lib-common";
+export { logger } from "./utils/logger";
