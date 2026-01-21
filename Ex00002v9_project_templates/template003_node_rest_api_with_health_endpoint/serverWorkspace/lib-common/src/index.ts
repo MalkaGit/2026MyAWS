@@ -38,3 +38,6 @@ export {
 export type {
   TypedRequest
 } from "./app/express.types";
+
+// Line below allows: import { createRequestValidator } from "@server/lib-common";
+export { createRequestValidator } from "./app/express.middlewares";
