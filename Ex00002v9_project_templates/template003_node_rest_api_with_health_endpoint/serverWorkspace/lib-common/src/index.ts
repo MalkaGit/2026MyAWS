@@ -33,3 +33,8 @@ export {
   NotFoundError,
   ConflictError
 } from "./domain/errors";
+
+// Line below allows: import { TypedRequest } from "@server/lib-common";
+export type {
+  TypedRequest
+} from "./app/express.types";
