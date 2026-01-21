@@ -9,3 +9,4 @@
  */
 
 export { createRequestValidator } from "./request-validator.middleware";
+export { requestContextMiddleware } from "./request-context.middleware";
