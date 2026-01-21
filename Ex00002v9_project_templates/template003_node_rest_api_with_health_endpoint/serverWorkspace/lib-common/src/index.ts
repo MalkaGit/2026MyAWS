@@ -16,3 +16,6 @@ export { withRequestContext, requestContext } from "./utils/request-context";
 
 // Line below allows: import { logger } from "@mycompanyname/lib-common";
 export { logger } from "./utils/logger";
+
+// Line below allows: import { mysqlPool } from "@server/lib-common";
+export { mysqlPool} from "./infra/db/mySqlDB.mysql2";
