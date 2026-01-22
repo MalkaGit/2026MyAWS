@@ -12,9 +12,12 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@mycompanyname/lib-common": "file:../lib-common"
+    "@mycompanyname/lib-common": "file:../lib-common",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
   }
 }
