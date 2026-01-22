@@ -4,12 +4,13 @@
  * This is the folder entry point.
  * It allows imports from the folder path instead of the specific file.
  * 
- * Example: import { DomainErrorCode, BadRequestError } from "./domain/errors";
- *          instead of: import { DomainErrorCode } from "./domain/errors/error.codes";
- *                      import { BadRequestError } from "./domain/errors/error.types";
+ * Example: import { BadRequestError } from "./domain/errors";
+ *          instead of: import { BadRequestError } from "./domain/errors/error.types";
+ * 
+ * Note: Error codes are now domain-scoped and defined in each domain module,
+ * not in lib-common. See ERROR_ARCHITECTURE_ANALYSIS.md for details.
  */
 
-export { DomainErrorCode } from "./error.codes";
 export { 
   DomainError,
   BadRequestError,

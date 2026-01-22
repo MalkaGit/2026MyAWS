@@ -23,9 +23,9 @@ export { mysqlPool} from "./infra/db/mySqlDB.mysql2";
 // Line below allows: import { testMySqlConnection } from "@server/lib-common";
 export {testMySqlConnection} from "./infra/db/mySqlDB.mysql2";
 
-// Line below allows: import { DomainErrorCode, BadRequestError, NotFoundError, etc. } from "@server/lib-common";
+// Line below allows: import { BadRequestError, NotFoundError, etc. } from "@server/lib-common";
+// Note: Error codes are now domain-scoped and defined in each domain module, not in lib-common
 export { 
-  DomainErrorCode,
   DomainError,
   BadRequestError,
   UnauthorizedError,

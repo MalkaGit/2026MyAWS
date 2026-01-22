@@ -27,7 +27,7 @@
  *                     log warning and return 
  *                     http status code 400/401/403/404/409 based on error type
  *                         BadRequestError (400), UnauthorizedError (401), ForbiddenError (403), NotFoundError (404), ConflictError (409)
- *                     and in body:  { code: DomainErrorCode, message: string }
+ *                     and in body:  { code: string, message: string }
  *     5. Unexpected:  Programming/database errors
  *                     logs full error and return
  *                     http status code 500 

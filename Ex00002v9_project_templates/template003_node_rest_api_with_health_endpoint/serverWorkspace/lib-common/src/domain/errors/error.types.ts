@@ -8,10 +8,11 @@
  *    Error codes are machine-readable and independent of HTTP status codes
  * 
  * Architecture:
- *    - Domain errors have error code (DomainErrorCode) that is independent of HTTP
+ *    - Domain errors have error code (string) that is independent of HTTP
  *    - Domain errors have human-readable message
  *    - Error codes are machine-readable for programmatic error handling
  *    - Framework-agnostic: errors are domain concepts, not tied to Express/HTTP
+ *    - Error codes are domain-scoped (e.g., "USER_PASSWORD_TOO_WEAK", "SONG_NOT_FOUND")
  * 
  * Flow:
  *    1. Domain layer throws domain errors (BadRequestError, NotFoundError, etc.)
@@ -20,9 +21,14 @@
  *    4. Frontend receives HTTP status code and domain error code for error handling
  * 
  * Usage:
- *    - In domain layer: throw new BadRequestError(DomainErrorCode.ARTIST_NOT_EXIST, "Artist does not exist")
- *    - In domain layer: throw new NotFoundError(DomainErrorCode.SONG_NOT_FOUND, "Song with id 123 not found")
+ *    - In domain layer: throw new BadRequestError("USER_PASSWORD_TOO_WEAK", "Password is too weak")
+ *    - In domain layer: throw new NotFoundError("SONG_NOT_FOUND", "Song with id 123 not found")
  *    - Error handler middleware automatically converts to HTTP response
+ * 
+ * Error Code Naming Convention:
+ *    - Use domain prefix: "USER_", "SONG_", "AUTH_", etc.
+ *    - Use descriptive names: "USER_PASSWORD_TOO_WEAK", "SONG_NOT_FOUND"
+ *    - Define error codes in each domain module (not in lib-common)
  * 
  * Error Types:
  *    - BadRequestError (400): Invalid request according to business rules
@@ -32,17 +38,15 @@
  *    - ConflictError (409): Conflict occurs (e.g., duplicate entry)
  */
 
-import { DomainErrorCode } from "./error.codes";
-
   /**
    * Base class for all domain-specific errors.
    */
   export abstract class DomainError extends Error {
-    readonly code: DomainErrorCode;
+    readonly code: string;
     readonly details?: unknown;
   
     protected constructor(
-      code: DomainErrorCode,
+      code: string,
       message: string,
       details?: unknown
     ) {
@@ -63,10 +67,10 @@ import { DomainErrorCode } from "./error.codes";
    * Thrown when the request is invalid according to business rules (400)
    * 
    * @example
-   * throw new BadRequestError(DomainErrorCode.ARTIST_NOT_EXIST, "Artist does not exist");
+   * throw new BadRequestError("USER_PASSWORD_TOO_WEAK", "Password is too weak");
    */
     export class BadRequestError extends DomainError {
-      constructor(code: DomainErrorCode, message: string, details?: unknown) {
+      constructor(code: string, message: string, details?: unknown) {
         super(code, message, details);
       }
     }
@@ -75,11 +79,11 @@ import { DomainErrorCode } from "./error.codes";
    * Thrown when authentication is required but missing (401)
    * 
    * @example
-   * throw new UnauthorizedError  ();
+   * throw new UnauthorizedError("Authentication required");
    */
   export class UnauthorizedError extends DomainError {
     constructor(message: string, details?: unknown) {
-      super(DomainErrorCode.UN_AUTHORIZED, message, details);
+      super("UNAUTHORIZED", message, details);
     }
   }
   
@@ -90,8 +94,8 @@ import { DomainErrorCode } from "./error.codes";
    * throw new ForbiddenError("User does not have permission");
    */
   export class ForbiddenError extends DomainError {
-    constructor( message: string, details?: unknown) {
-      super(DomainErrorCode.FORBIDDEN, message, details);
+    constructor(message: string, details?: unknown) {
+      super("FORBIDDEN", message, details);
     }
   }
   
@@ -99,10 +103,10 @@ import { DomainErrorCode } from "./error.codes";
    * Thrown when a requested entity is not found (404)
    * 
    * @example
-   * throw new NotFoundError(DomainErrorCode.SONG_NOT_FOUND, "Song with id 123 not found");
+   * throw new NotFoundError("SONG_NOT_FOUND", "Song with id 123 not found");
    */
   export class NotFoundError extends DomainError {
-    constructor(code: DomainErrorCode, message: string, details?: unknown) {
+    constructor(code: string, message: string, details?: unknown) {
       super(code, message, details);
     }
   }
@@ -113,10 +117,10 @@ import { DomainErrorCode } from "./error.codes";
    * Thrown when a conflict occurs (e.g., duplicate entry) (409)
    * 
    * @example
-   * throw new ConflictError(DomainErrorCode.DUPLICATE_SONG, "Song title already exists");
+   * throw new ConflictError("USER_ALREADY_EXISTS", "User with email already exists");
    */
   export class ConflictError extends DomainError {
-    constructor(code: DomainErrorCode, message: string, details?: unknown) {
+    constructor(code: string, message: string, details?: unknown) {
       super(code, message, details);
     }
   }
